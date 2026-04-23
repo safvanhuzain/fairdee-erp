@@ -1,0 +1,36 @@
+{% extends 'desk/base.html' %}
+
+{% block title %}{{ page_title }} · Tree · Fairdee Finance{% endblock %}
+{% block topbar_title %}{{ page_title }} (Tree){% endblock %}
+
+{% block workspace %}
+<div class="desk-page-head">
+  <div class="desk-page-head__crumb">
+    <a href="{% url 'desk:home' %}">Home</a>
+    · {{ page_subtitle }}
+    · <a href="{{ document_list_url }}">{{ page_title }}</a>
+  </div>
+  <h1 class="desk-page-head__title">{{ page_title }} — Tree</h1>
+  <p class="desk-page-head__hint desk-page-head__hint--tree">Hierarchy from the <strong>{{ tree_parent_field }}</strong> field (same company scope as the list). Expand rows to show children.</p>
+</div>
+
+<div class="desk-toolbar desk-toolbar--tree">
+  <div class="desk-toolbar__start"></div>
+  <div class="desk-toolbar__end">
+    <a class="desk-btn desk-btn--secondary" href="{{ document_list_url }}">List View</a>
+    {% if user.is_staff and admin_url %}
+    <a class="desk-btn desk-btn--secondary" href="{{ admin_url }}">Open in Admin</a>
+    {% endif %}
+  </div>
+</div>
+
+<div class="desk-tree-panel">
+  {% if tree_nodes %}
+  <ul class="desk-tree desk-tree--root" role="tree">
+    {% include 'desk/includes/tree_nodes.html' with nodes=tree_nodes only %}
+  </ul>
+  {% else %}
+  <div class="desk-empty">No records in scope. Use <a href="{{ document_list_url }}">List View</a> or Admin to add data.</div>
+  {% endif %}
+</div>
+{% endblock %}

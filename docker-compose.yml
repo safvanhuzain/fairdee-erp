@@ -1,0 +1,14 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: fairdee
+      POSTGRES_USER: fairdee
+      POSTGRES_PASSWORD: fairdee
+    ports:
+      - '5432:5432'
+    volumes:
+      - fairdee_pgdata:/var/lib/postgresql/data
+
+volumes:
+  fairdee_pgdata:

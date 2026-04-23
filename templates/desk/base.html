@@ -1,0 +1,72 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Fairdee Finance{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'desk/desk.css' %}">
+  {% block extra_head %}{% endblock %}
+</head>
+<body class="desk-body">
+  <div class="desk-shell">
+    <aside class="desk-sidebar" aria-label="Main navigation">
+      <div class="desk-sidebar__brand">
+        <span class="desk-sidebar__brand-mark" aria-hidden="true">F</span>
+        <span>Fairdee Finance</span>
+      </div>
+      <div class="desk-sidebar__scroll">
+        <div class="desk-nav__label">Workspace</div>
+        <nav>
+          <a class="desk-nav__link {% if request.resolver_match.url_name == 'home' %}is-active{% endif %}" href="{% url 'desk:home' %}">
+            <svg class="desk-nav__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            Home
+          </a>
+        </nav>
+        {% for section in desk_nav_sections %}
+        <div class="desk-nav__label">{{ section.label }}</div>
+        <nav>
+          {% for doc in section.items %}
+          <a class="desk-nav__link {% if doc.nav_url_name == 'document_list' %}{% if request.resolver_match.kwargs.app_label == doc.nav_app_label and request.resolver_match.kwargs.model_name == doc.nav_model_name %}{% if request.resolver_match.url_name == 'document_list' or request.resolver_match.url_name == 'document_tree' %}is-active{% endif %}{% endif %}{% elif request.resolver_match.url_name == doc.nav_url_name %}is-active{% endif %}" href="{{ doc.href }}">
+            <svg class="desk-nav__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            {{ doc.label }}
+          </a>
+          {% endfor %}
+        </nav>
+        {% endfor %}
+      </div>
+      <div class="desk-sidebar__footer">
+        <a href="/admin/">Django Admin</a>
+        ·
+        <a href="{% url 'logout' %}">Log out</a>
+      </div>
+    </aside>
+    <div class="desk-main">
+      <header class="desk-topbar">
+        <div class="desk-topbar__title">{% block topbar_title %}Desk{% endblock %}</div>
+        <div class="desk-topbar__actions">
+          {% if user.is_authenticated %}
+          <div class="desk-user">
+            <span class="desk-user__avatar" aria-hidden="true">{{ user.email.0|upper }}</span>
+            <span>{{ user.email }}</span>
+          </div>
+          {% endif %}
+        </div>
+      </header>
+      <main class="desk-workspace">
+        {% if messages %}
+        <ul class="desk-messages">
+          {% for message in messages %}
+          <li class="desk-messages__item desk-messages__item--{{ message.level_tag }}">{{ message }}</li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+        {% block workspace %}{% endblock %}
+      </main>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,45 @@
+{% extends 'desk/base.html' %}
+
+{% block extra_head %}
+{% include 'desk/includes/tom_select_desk_head.html' %}
+{% endblock %}
+
+{% block title %}{{ page_title }} · Fairdee Finance{% endblock %}
+{% block topbar_title %}{{ page_title }}{% endblock %}
+
+{% block workspace %}
+<div class="desk-page-head">
+  <div class="desk-page-head__crumb">
+    <a href="{% url 'desk:home' %}">Home</a>
+    · {{ page_subtitle }}
+    · <a href="{{ list_url }}">{{ doctype_plural }}</a>
+  </div>
+  <h1 class="desk-page-head__title">{{ page_title }}</h1>
+</div>
+
+<form method="post" action="" class="desk-doc-form desk-doc-form--two-col" {% if form.is_multipart %}enctype="multipart/form-data"{% endif %}>
+  {% csrf_token %}
+  {% if form.non_field_errors %}
+  <ul class="desk-errorlist">
+    {% for err in form.non_field_errors %}<li>{{ err }}</li>{% endfor %}
+  </ul>
+  {% endif %}
+
+  <div class="desk-doc-form__grid">
+    {% for field in form %}
+    <div class="desk-field">
+      {{ field.label_tag }}
+      {% if field.help_text %}<p class="desk-field__hint">{{ field.help_text }}</p>{% endif %}
+      {{ field }}
+      {% if field.errors %}<div class="desk-field__errors">{{ field.errors }}</div>{% endif %}
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="desk-modal__actions desk-doc-form__actions">
+    <a class="desk-btn desk-btn--secondary" href="{{ list_url }}">Cancel</a>
+    <button type="submit" class="desk-btn desk-btn--primary">Save</button>
+  </div>
+</form>
+{% include 'desk/includes/tom_select_desk_scripts.html' %}
+{% endblock %}

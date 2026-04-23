@@ -1,0 +1,44 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Log in · Fairdee Finance</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'desk/desk.css' %}">
+</head>
+<body class="desk-login-body">
+  <div class="desk-login">
+    <div class="desk-login__brand">
+      <span class="desk-sidebar__brand-mark" aria-hidden="true">F</span>
+      <div>
+        <h1 class="desk-login__title">Sign in</h1>
+        <p class="desk-login__subtitle">Fairdee Finance desk</p>
+      </div>
+    </div>
+    <form method="post" action="{% url 'login' %}">
+      {% csrf_token %}
+      {% if form.non_field_errors %}
+      <ul class="desk-errorlist">
+        {% for err in form.non_field_errors %}<li>{{ err }}</li>{% endfor %}
+      </ul>
+      {% endif %}
+      <div class="desk-field">
+        {{ form.username.label_tag }}
+        {{ form.username }}
+        {% if form.username.errors %}<div class="desk-errorlist" style="margin-top:8px;">{{ form.username.errors }}</div>{% endif %}
+      </div>
+      <div class="desk-field">
+        {{ form.password.label_tag }}
+        {{ form.password }}
+        {% if form.password.errors %}<div class="desk-errorlist" style="margin-top:8px;">{{ form.password.errors }}</div>{% endif %}
+      </div>
+      <input type="hidden" name="next" value="{{ next }}">
+      <button type="submit" class="desk-btn desk-btn--primary desk-login__submit">Log in</button>
+    </form>
+  </div>
+</body>
+</html>

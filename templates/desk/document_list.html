@@ -1,0 +1,458 @@
+{% extends 'desk/base.html' %}
+{% load desk_tags %}
+
+{% block title %}{{ page_title }} · Fairdee Finance{% endblock %}
+{% block topbar_title %}{{ page_title }}{% endblock %}
+
+{% block workspace %}
+<div class="desk-page-head">
+  <div class="desk-page-head__crumb">
+    <a href="{% url 'desk:home' %}">Home</a>
+    · {{ page_subtitle }}
+  </div>
+  <h1 class="desk-page-head__title">{{ page_title }}</h1>
+</div>
+
+{% if desk_filters_enabled %}
+{{ desk_filter_schema|json_script:"desk-filter-schema-json" }}
+<form method="get" action="{{ request.path }}" id="desk-filter-get-form" class="desk-filter-get-form">
+  {% if desk_effective_page_size != 20 %}
+  <input type="hidden" name="page_size" value="{{ desk_effective_page_size }}">
+  {% endif %}
+  {% if desk_sort_enabled %}
+  <div id="desk-sort-panel" class="desk-sort-panel{% if desk_sort_panel_open %} is-open{% endif %}" {% if not desk_sort_panel_open %}hidden{% endif %}>
+    <div class="desk-sort-panel__head">
+      <span class="desk-sort-panel__title">Sort</span>
+      <p class="desk-sort-panel__hint">Choose a field and direction, then apply (filters and page length are kept).</p>
+    </div>
+    <div class="desk-sort-panel__row">
+      <label class="desk-sort-panel__label" for="desk-sort-field">Field</label>
+      <select id="desk-sort-field" class="desk-modal-select" name="sort" aria-label="Sort field">
+        {% for f in desk_sort_fields %}
+        <option value="{{ f.name }}" {% if f.name == desk_sort_field %}selected{% endif %}>{{ f.label }}</option>
+        {% endfor %}
+      </select>
+      <label class="desk-sort-panel__label" for="desk-sort-dir">Direction</label>
+      <select id="desk-sort-dir" class="desk-modal-select" name="sort_dir" aria-label="Sort direction">
+        <option value="asc" {% if desk_sort_dir == 'asc' %}selected{% endif %}>Ascending</option>
+        <option value="desc" {% if desk_sort_dir == 'desc' %}selected{% endif %}>Descending</option>
+      </select>
+    </div>
+    <div class="desk-sort-panel__actions">
+      <button type="submit" class="desk-btn desk-btn--primary">Apply sort</button>
+    </div>
+  </div>
+  {% endif %}
+  <div id="desk-filter-panel" class="desk-filter-panel{% if desk_filter_panel_open %} is-open{% endif %}" {% if not desk_filter_panel_open %}hidden{% endif %}>
+    <div class="desk-filter-panel__head">
+      <span class="desk-filter-panel__title">Filters</span>
+      <p class="desk-filter-panel__hint">All conditions use <strong>AND</strong>. Choose a field, an operator, and a value (where needed).</p>
+    </div>
+    {% if desk_filter_errors %}
+    <ul class="desk-filter-panel__errors">
+      {% for err in desk_filter_errors %}<li>{{ err }}</li>{% endfor %}
+    </ul>
+    {% endif %}
+    <div id="desk-filter-rows" class="desk-filter-rows">
+      {% for row in desk_filter_rows %}
+      <div class="desk-filter-row" data-row-index="{{ forloop.counter0 }}">
+        <select class="desk-modal-select desk-filter-field" name="d{{ forloop.counter0 }}_field" aria-label="Field">
+          <option value="">— Field —</option>
+          {% for f in desk_filter_schema %}
+          <option value="{{ f.name }}" {% if row.field == f.name %}selected{% endif %}>{{ f.label }}</option>
+          {% endfor %}
+        </select>
+        <select class="desk-modal-select desk-filter-op" name="d{{ forloop.counter0 }}_op" aria-label="Operator">
+          {% for f in desk_filter_schema %}
+          {% if row.field == f.name %}
+            {% for op in f.ops %}
+            <option value="{{ op.value }}" {% if row.op == op.value %}selected{% endif %}>{{ op.label }}</option>
+            {% endfor %}
+          {% endif %}
+          {% endfor %}
+          {% if not row.field %}
+            <option value="equals">Equals</option>
+            <option value="not_equals">Not equals</option>
+            <option value="like">Like</option>
+            <option value="not_like">Not like</option>
+            <option value="is">Is set</option>
+            <option value="is_not">Is not set</option>
+          {% endif %}
+        </select>
+        <input type="text" class="desk-modal-input desk-filter-val" name="d{{ forloop.counter0 }}_val" value="{{ row.val }}" placeholder="Value" aria-label="Value" autocomplete="off">
+        <button type="button" class="desk-btn desk-btn--secondary desk-filter-row-remove" title="Remove row" aria-label="Remove filter row">×</button>
+      </div>
+      {% endfor %}
+    </div>
+    <div class="desk-filter-panel__actions">
+      <button type="button" class="desk-btn desk-btn--secondary" id="desk-filter-add-row">Add condition</button>
+      <span class="desk-filter-panel__spacer"></span>
+      <a class="desk-btn desk-btn--secondary" href="{{ request.path }}">Clear all</a>
+      <button type="submit" class="desk-btn desk-btn--primary">Apply filters</button>
+    </div>
+  </div>
+</form>
+{% endif %}
+
+<form method="post" action="{{ request.path }}{% if desk_list_query %}?{{ desk_list_query }}{% endif %}" id="desk-document-bulk-form" class="desk-document-bulk">
+  {% csrf_token %}
+  <input type="hidden" name="desk_bulk_action" value="" id="desk-bulk-action-input">
+
+    <div class="desk-toolbar desk-toolbar--bulk">
+    {% if desk_filters_enabled %}
+    <div class="desk-toolbar__start desk-toolbar__start--query">
+      {% if desk_sort_enabled %}
+      <button type="button" class="desk-btn desk-btn--secondary{% if desk_sort_active_dot %} desk-btn--has-dot{% endif %}" id="desk-sort-toggle" aria-expanded="{% if desk_sort_panel_open %}true{% else %}false{% endif %}" aria-controls="desk-sort-panel">
+        Sort{% if desk_sort_active_dot %} <span class="desk-filter-badge" aria-hidden="true">●</span>{% endif %}
+      </button>
+      {% endif %}
+      <button type="button" class="desk-btn desk-btn--secondary{% if desk_filter_applied %} desk-btn--has-dot{% endif %}" id="desk-filter-toggle" aria-expanded="{% if desk_filter_panel_open %}true{% else %}false{% endif %}" aria-controls="desk-filter-panel">
+        Filter{% if desk_filter_applied %} <span class="desk-filter-badge" aria-hidden="true">●</span>{% endif %}
+      </button>
+    </div>
+    {% endif %}
+    <div class="desk-bulk-bar" id="desk-bulk-bar" hidden>
+      <span class="desk-bulk-bar__count" id="desk-bulk-count">0 selected</span>
+      {% if can_delete %}
+      <div class="desk-dropdown" id="desk-bulk-dropdown">
+        <button type="button" class="desk-btn desk-btn--secondary" id="desk-bulk-actions-btn" aria-expanded="false" aria-haspopup="true">
+          Actions
+        </button>
+        <div class="desk-dropdown__menu" id="desk-bulk-dropdown-menu" role="menu" hidden>
+          <button type="button" class="desk-dropdown__item desk-dropdown__item--danger" id="desk-bulk-delete-btn" role="menuitem">
+            Delete
+          </button>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+    <div class="desk-toolbar__end">
+      {% if desk_tree_view_enabled and desk_tree_view_url %}
+      <a class="desk-btn desk-btn--secondary" href="{{ desk_tree_view_url }}">Tree View</a>
+      {% endif %}
+      {% if can_create and document_create_url %}
+      <a class="desk-btn desk-btn--primary" href="{{ document_create_url }}">Create</a>
+      {% endif %}
+      {% if user.is_staff and admin_url %}
+      <a class="desk-btn desk-btn--secondary" href="{{ admin_url }}">Open in Admin</a>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="desk-table-wrap">
+    {% if rows %}
+    <table class="desk-table desk-table--bulk">
+      <thead>
+        <tr>
+          <th class="desk-table__check" scope="col">
+            <input type="checkbox" id="desk-select-all" class="desk-table__check-input" title="Select all" aria-label="Select all rows">
+          </th>
+          {% for col in columns %}
+          <th>{{ col.label }}</th>
+          {% endfor %}
+          {% if row_edit_enabled %}
+          <th scope="col">Actions</th>
+          {% endif %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in rows %}
+        <tr>
+          <td class="desk-table__check">
+            <input type="checkbox" name="selected" value="{{ row.pk }}" class="desk-row-check desk-table__check-input" aria-label="Select row {{ row.pk }}">
+          </td>
+          {% for col in columns %}
+          <td>
+            {% if col.key == 'status' %}
+              <span class="desk-badge">{{ row|desk_cell:col.key }}</span>
+            {% elif col.key == 'is_active' %}
+              {% if row.is_active %}<span class="desk-badge">Active</span>{% else %}<span class="desk-badge desk-badge--muted">Inactive</span>{% endif %}
+            {% else %}
+              {{ row|desk_cell:col.key }}
+            {% endif %}
+          </td>
+          {% endfor %}
+          {% if row_edit_enabled %}
+          <td>
+            <a class="desk-link-edit" href="{% url 'desk:document_change' app_label=list_model_app model_name=list_model_name pk=row.pk %}">Edit</a>
+          </td>
+          {% endif %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="desk-empty">
+      {% if desk_filter_applied %}
+      No records match your filters. <a href="{{ request.path }}">Clear filters</a>
+      {% elif can_create and document_create_url %}
+      No records yet. <a href="{{ document_create_url }}">Create one</a> or use Admin.
+      {% else %}
+      No records yet. Use Admin to add data.
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+</form>
+
+<div class="desk-list-footer">
+  <div class="desk-page-size" role="toolbar" aria-label="Page length">
+    <span class="desk-page-size__label">Page length</span>
+    {% for item in desk_page_size_nav %}
+      {% if item.active %}
+      <span class="desk-page-size__btn is-active" aria-current="true">{{ item.size }}</span>
+      {% else %}
+      <a class="desk-page-size__btn" href="{{ request.path }}{{ item.href }}">{{ item.size }}</a>
+      {% endif %}
+    {% endfor %}
+  </div>
+  {% if page_obj.paginator.num_pages > 1 %}
+  <div class="desk-pagination">
+    {% if page_obj.has_previous %}
+    <a href="?{% if desk_list_query %}{{ desk_list_query }}&amp;{% endif %}page={{ page_obj.previous_page_number }}">Previous</a>
+    {% endif %}
+    <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}
+    <a href="?{% if desk_list_query %}{{ desk_list_query }}&amp;{% endif %}page={{ page_obj.next_page_number }}">Next</a>
+    {% endif %}
+  </div>
+  {% endif %}
+</div>
+
+<script>
+(function () {
+  var schemaEl = document.getElementById('desk-filter-schema-json');
+  var filterForm = document.getElementById('desk-filter-get-form');
+  var filterPanel = document.getElementById('desk-filter-panel');
+  var filterToggle = document.getElementById('desk-filter-toggle');
+  var filterRows = document.getElementById('desk-filter-rows');
+  var addRowBtn = document.getElementById('desk-filter-add-row');
+  var schema = [];
+  if (schemaEl) {
+    try { schema = JSON.parse(schemaEl.textContent); } catch (e) { schema = []; }
+  }
+
+  function opOptionsForField(fieldName) {
+    var def = [
+      { value: 'equals', label: 'Equals' },
+      { value: 'not_equals', label: 'Not equals' },
+      { value: 'like', label: 'Like' },
+      { value: 'not_like', label: 'Not like' },
+      { value: 'is', label: 'Is set' },
+      { value: 'is_not', label: 'Is not set' }
+    ];
+    if (!fieldName) return def;
+    for (var i = 0; i < schema.length; i++) {
+      if (schema[i].name === fieldName) return schema[i].ops && schema[i].ops.length ? schema[i].ops : def;
+    }
+    return def;
+  }
+
+  function fillOpSelect(selectEl, fieldName, selectedOp) {
+    var ops = opOptionsForField(fieldName);
+    selectEl.innerHTML = '';
+    ops.forEach(function (op) {
+      var opt = document.createElement('option');
+      opt.value = op.value;
+      opt.textContent = op.label;
+      if (selectedOp && op.value === selectedOp) opt.selected = true;
+      selectEl.appendChild(opt);
+    });
+    if (!selectedOp && selectEl.options.length) selectEl.selectedIndex = 0;
+  }
+
+  function wireRow(row) {
+    var fieldSel = row.querySelector('.desk-filter-field');
+    var opSel = row.querySelector('.desk-filter-op');
+    var removeBtn = row.querySelector('.desk-filter-row-remove');
+    if (fieldSel && opSel) {
+      fieldSel.addEventListener('change', function () {
+        fillOpSelect(opSel, fieldSel.value, null);
+      });
+    }
+    if (removeBtn) {
+      removeBtn.addEventListener('click', function () {
+        if (filterRows && filterRows.querySelectorAll('.desk-filter-row').length <= 1) {
+          fieldSel.value = '';
+          opSel.value = 'equals';
+          fillOpSelect(opSel, '', 'equals');
+          row.querySelector('.desk-filter-val').value = '';
+          return;
+        }
+        row.remove();
+      });
+    }
+  }
+
+  function reindexFilterRows() {
+    if (!filterRows) return;
+    var rows = filterRows.querySelectorAll('.desk-filter-row');
+    rows.forEach(function (row, i) {
+      row.setAttribute('data-row-index', String(i));
+      var fieldSel = row.querySelector('.desk-filter-field');
+      var opSel = row.querySelector('.desk-filter-op');
+      var valIn = row.querySelector('.desk-filter-val');
+      if (fieldSel) fieldSel.name = 'd' + i + '_field';
+      if (opSel) opSel.name = 'd' + i + '_op';
+      if (valIn) valIn.name = 'd' + i + '_val';
+    });
+  }
+
+  if (filterRows) {
+    filterRows.querySelectorAll('.desk-filter-row').forEach(wireRow);
+  }
+
+  if (addRowBtn && filterRows) {
+    addRowBtn.addEventListener('click', function () {
+      var row = document.createElement('div');
+      row.className = 'desk-filter-row';
+      var fieldSel = document.createElement('select');
+      fieldSel.className = 'desk-modal-select desk-filter-field';
+      fieldSel.setAttribute('aria-label', 'Field');
+      var o0 = document.createElement('option');
+      o0.value = '';
+      o0.textContent = '— Field —';
+      fieldSel.appendChild(o0);
+      schema.forEach(function (f) {
+        var o = document.createElement('option');
+        o.value = f.name;
+        o.textContent = f.label || f.name;
+        fieldSel.appendChild(o);
+      });
+      var opSel = document.createElement('select');
+      opSel.className = 'desk-modal-select desk-filter-op';
+      opSel.setAttribute('aria-label', 'Operator');
+      var valIn = document.createElement('input');
+      valIn.type = 'text';
+      valIn.className = 'desk-modal-input desk-filter-val';
+      valIn.value = '';
+      valIn.placeholder = 'Value';
+      valIn.setAttribute('aria-label', 'Value');
+      valIn.setAttribute('autocomplete', 'off');
+      var rm = document.createElement('button');
+      rm.type = 'button';
+      rm.className = 'desk-btn desk-btn--secondary desk-filter-row-remove';
+      rm.title = 'Remove row';
+      rm.setAttribute('aria-label', 'Remove filter row');
+      rm.textContent = '×';
+      row.appendChild(fieldSel);
+      row.appendChild(opSel);
+      row.appendChild(valIn);
+      row.appendChild(rm);
+      filterRows.appendChild(row);
+      fillOpSelect(opSel, '', 'equals');
+      wireRow(row);
+      reindexFilterRows();
+    });
+  }
+
+  if (filterForm) {
+    filterForm.addEventListener('submit', function () {
+      reindexFilterRows();
+    });
+  }
+
+  if (filterToggle && filterPanel) {
+    filterToggle.addEventListener('click', function () {
+      var open = filterPanel.hasAttribute('hidden');
+      if (open) {
+        filterPanel.removeAttribute('hidden');
+        filterPanel.classList.add('is-open');
+        filterToggle.setAttribute('aria-expanded', 'true');
+      } else {
+        filterPanel.setAttribute('hidden', 'hidden');
+        filterPanel.classList.remove('is-open');
+        filterToggle.setAttribute('aria-expanded', 'false');
+      }
+    });
+  }
+
+  var sortToggle = document.getElementById('desk-sort-toggle');
+  var sortPanel = document.getElementById('desk-sort-panel');
+  if (sortToggle && sortPanel) {
+    sortToggle.addEventListener('click', function () {
+      var open = sortPanel.hasAttribute('hidden');
+      if (open) {
+        sortPanel.removeAttribute('hidden');
+        sortPanel.classList.add('is-open');
+        sortToggle.setAttribute('aria-expanded', 'true');
+      } else {
+        sortPanel.setAttribute('hidden', 'hidden');
+        sortPanel.classList.remove('is-open');
+        sortToggle.setAttribute('aria-expanded', 'false');
+      }
+    });
+  }
+
+  var form = document.getElementById('desk-document-bulk-form');
+  if (!form) return;
+  var bar = document.getElementById('desk-bulk-bar');
+  var countEl = document.getElementById('desk-bulk-count');
+  var selectAll = document.getElementById('desk-select-all');
+  var rowChecks = function () { return form.querySelectorAll('.desk-row-check'); };
+  var actionInput = document.getElementById('desk-bulk-action-input');
+  var dropBtn = document.getElementById('desk-bulk-actions-btn');
+  var dropMenu = document.getElementById('desk-bulk-dropdown-menu');
+  var deleteBtn = document.getElementById('desk-bulk-delete-btn');
+
+  function selectedCount() {
+    var n = 0;
+    rowChecks().forEach(function (cb) { if (cb.checked) n++; });
+    return n;
+  }
+
+  function syncBar() {
+    var n = selectedCount();
+    if (!bar || !countEl) return;
+    if (n > 0) {
+      bar.hidden = false;
+      countEl.textContent = n + (n === 1 ? ' row selected' : ' rows selected');
+    } else {
+      bar.hidden = true;
+      if (dropMenu) dropMenu.hidden = true;
+      if (dropBtn) dropBtn.setAttribute('aria-expanded', 'false');
+    }
+    if (selectAll) {
+      var all = rowChecks();
+      var allChecked = all.length && selectedCount() === all.length;
+      selectAll.checked = allChecked;
+      selectAll.indeterminate = selectedCount() > 0 && !allChecked;
+    }
+  }
+
+  rowChecks().forEach(function (cb) {
+    cb.addEventListener('change', syncBar);
+  });
+  if (selectAll) {
+    selectAll.addEventListener('change', function () {
+      var on = selectAll.checked;
+      rowChecks().forEach(function (cb) { cb.checked = on; });
+      syncBar();
+    });
+  }
+
+  if (dropBtn && dropMenu) {
+    dropBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var open = dropMenu.hidden === false;
+      dropMenu.hidden = open;
+      dropBtn.setAttribute('aria-expanded', open ? 'false' : 'true');
+    });
+    document.addEventListener('click', function () {
+      dropMenu.hidden = true;
+      dropBtn.setAttribute('aria-expanded', 'false');
+    });
+    dropMenu.addEventListener('click', function (e) { e.stopPropagation(); });
+  }
+
+  if (deleteBtn && actionInput) {
+    deleteBtn.addEventListener('click', function () {
+      if (selectedCount() === 0) return;
+      if (!confirm('Delete the selected row(s)? This cannot be undone.')) return;
+      actionInput.value = 'delete';
+      form.submit();
+    });
+  }
+})();
+</script>
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends 'desk/base.html' %}
+
+{% block title %}Home · Fairdee Finance{% endblock %}
+{% block topbar_title %}Home{% endblock %}
+
+{% block workspace %}
+<div class="desk-page-head">
+  <div class="desk-page-head__crumb">Workspace</div>
+  <h1 class="desk-page-head__title">Welcome</h1>
+</div>
+<p class="desk-lead">Pick a module to work with. List views mirror your data; use Django Admin for full create/edit until forms ship.</p>
+
+<div class="desk-card-grid">
+  {% for doc in desk_documents_catalog %}
+  {% if doc.has_access %}
+  <a class="desk-card" href="{{ doc.href }}">
+    <div class="desk-card__title">{{ doc.label }}</div>
+    <div class="desk-card__meta">{{ doc.section }}</div>
+  </a>
+  {% endif %}
+  {% endfor %}
+  <a class="desk-card" href="/admin/">
+    <div class="desk-card__title">Administration</div>
+    <div class="desk-card__meta">Users, groups, permissions</div>
+  </a>
+</div>
+{% endblock %}

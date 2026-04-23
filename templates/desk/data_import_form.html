@@ -1,0 +1,267 @@
+{% extends 'desk/base.html' %}
+
+{% block extra_head %}
+{% include 'desk/includes/tom_select_desk_head.html' %}
+{% endblock %}
+
+{% block title %}{{ page_title }} · Fairdee Finance{% endblock %}
+{% block topbar_title %}{{ page_title }}{% endblock %}
+
+{% block workspace %}
+<div
+  id="desk-dataimport-page"
+  class="desk-dataimport-page"
+  data-fields-url="{% url 'desk:dataimport_template_fields' %}"
+  data-download-url="{% url 'desk:dataimport_template_download' %}"
+>
+<div class="desk-page-head">
+  <div class="desk-page-head__crumb">
+    <a href="{% url 'desk:home' %}">Home</a>
+    · {{ page_subtitle }}
+    · <a href="{{ list_url }}">{{ doctype_plural }}</a>
+  </div>
+  <h1 class="desk-page-head__title">{{ page_title }}</h1>
+</div>
+
+<p class="desk-lead desk-lead--tight">Choose a target model, import mode, and a CSV file. Headers must match the model&rsquo;s field names (case-insensitive). For <strong>Update or insert new</strong>, include an <code>id</code> column matching existing rows to update.</p>
+
+<form method="post" action="" class="desk-doc-form desk-doc-form--wide" enctype="multipart/form-data">
+  {% csrf_token %}
+  {% if form.non_field_errors %}
+  <ul class="desk-errorlist">
+    {% for err in form.non_field_errors %}<li>{{ err }}</li>{% endfor %}
+  </ul>
+  {% endif %}
+
+  <div class="desk-doc-form__grid">
+    {% for field in form %}
+    <div class="desk-field desk-field--full">
+      {{ field.label_tag }}
+      {% if field.help_text %}<p class="desk-field__hint">{{ field.help_text }}</p>{% endif %}
+      {{ field }}
+      {% if field.errors %}<div class="desk-field__errors">{{ field.errors }}</div>{% endif %}
+    </div>
+    {% endfor %}
+    <div class="desk-field desk-field--full">
+      <span class="desk-field__legend">CSV template</span>
+      <p class="desk-field__hint">Pick <strong>Model</strong> above, then build a CSV with only the columns you need. For Google Sheets, download as CSV after filling the template.</p>
+      <button type="button" class="desk-btn desk-btn--secondary" id="desk-dataimport-template-btn" disabled>Download template…</button>
+    </div>
+  </div>
+
+  <div class="desk-modal__actions desk-doc-form__actions">
+    <a class="desk-btn desk-btn--secondary" href="{{ list_url }}">Cancel</a>
+    <button type="submit" class="desk-btn desk-btn--primary">{{ submit_label }}</button>
+  </div>
+</form>
+
+<div
+  id="desk-template-modal"
+  class="desk-modal"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="desk-template-modal-title"
+  aria-hidden="true"
+>
+  <div class="desk-modal__panel desk-modal__panel--wide">
+    <div class="desk-modal__head">
+      <h2 id="desk-template-modal-title" class="desk-modal__title">Build import template</h2>
+      <button type="button" class="desk-modal__close" data-close-template-modal aria-label="Close">&times;</button>
+    </div>
+    <div class="desk-modal__form">
+      <p class="desk-field__hint" style="margin-top:0">Select the fields to include as CSV column headers (in that order). Only fields allowed for import are listed.</p>
+      <p id="desk-template-modal-error" class="desk-template-modal__error" hidden></p>
+      <div class="desk-template-toolbar">
+        <label class="desk-template-select-all">
+          <input type="checkbox" id="desk-template-select-all"> Select all
+        </label>
+      </div>
+      <div id="desk-template-field-list" class="desk-template-field-grid"></div>
+      <div class="desk-modal__actions">
+        <button type="button" class="desk-btn desk-btn--secondary" data-close-template-modal>Cancel</button>
+        <button type="button" class="desk-btn desk-btn--primary" id="desk-template-download-btn">Download CSV</button>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<script>
+(function () {
+  var root = document.getElementById('desk-dataimport-page');
+  if (!root) return;
+  var fieldsUrl = root.getAttribute('data-fields-url');
+  var downloadUrl = root.getAttribute('data-download-url');
+  var ctSelect = root.querySelector('select[name="content_type"]');
+  var tplBtn = document.getElementById('desk-dataimport-template-btn');
+  var modal = document.getElementById('desk-template-modal');
+  var listEl = document.getElementById('desk-template-field-list');
+  var selectAll = document.getElementById('desk-template-select-all');
+  var errEl = document.getElementById('desk-template-modal-error');
+  var dlBtn = document.getElementById('desk-template-download-btn');
+  var csrfInput = root.querySelector('[name=csrfmiddlewaretoken]');
+
+  function getCookie(name) {
+    var m = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
+    return m ? m.pop() : '';
+  }
+  function csrfToken() {
+    return (csrfInput && csrfInput.value) || getCookie('csrftoken') || '';
+  }
+
+  function setErr(msg) {
+    if (!errEl) return;
+    if (msg) {
+      errEl.textContent = msg;
+      errEl.hidden = false;
+    } else {
+      errEl.textContent = '';
+      errEl.hidden = true;
+    }
+  }
+
+  function openModal() {
+    if (!modal) return;
+    modal.classList.add('is-open');
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('desk-modal-open');
+  }
+  function closeModal() {
+    if (!modal) return;
+    modal.classList.remove('is-open');
+    modal.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('desk-modal-open');
+    setErr('');
+  }
+
+  function syncTplButton() {
+    if (!tplBtn || !ctSelect) return;
+    tplBtn.disabled = !ctSelect.value;
+  }
+  if (ctSelect) {
+    ctSelect.addEventListener('change', syncTplButton);
+    syncTplButton();
+  }
+
+  function renderFields(fields) {
+    if (!listEl) return;
+    listEl.innerHTML = '';
+    fields.forEach(function (f) {
+      var id = 'tpl-field-' + f.name.replace(/[^a-zA-Z0-9_]/g, '_');
+      var wrap = document.createElement('label');
+      wrap.className = 'desk-template-field-item';
+      var cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.name = 'tpl_field';
+      cb.value = f.name;
+      cb.id = id;
+      var inner = document.createElement('span');
+      inner.className = 'desk-template-field-item__text';
+      var strong = document.createElement('strong');
+      strong.textContent = f.name;
+      var sub = document.createElement('span');
+      sub.className = 'desk-template-field-item__label';
+      sub.textContent = f.label || '';
+      inner.appendChild(strong);
+      inner.appendChild(sub);
+      wrap.appendChild(cb);
+      wrap.appendChild(inner);
+      listEl.appendChild(wrap);
+    });
+    if (selectAll) selectAll.checked = false;
+  }
+
+  if (tplBtn && ctSelect && fieldsUrl && modal) {
+    tplBtn.addEventListener('click', function () {
+      if (!ctSelect.value) return;
+      setErr('');
+      listEl.innerHTML = '<p class="desk-field__hint">Loading fields…</p>';
+      openModal();
+      var url = fieldsUrl + (fieldsUrl.indexOf('?') >= 0 ? '&' : '?') + 'content_type_id=' + encodeURIComponent(ctSelect.value);
+      fetch(url, { credentials: 'same-origin', headers: { Accept: 'application/json' } })
+        .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, status: r.status, body: j }; }); })
+        .then(function (res) {
+          if (!res.ok) {
+            setErr(res.body.error || ('Request failed (' + res.status + ')'));
+            listEl.innerHTML = '';
+            return;
+          }
+          if (!res.body.fields || !res.body.fields.length) {
+            setErr('No importable fields for this model.');
+            listEl.innerHTML = '';
+            return;
+          }
+          renderFields(res.body.fields);
+        })
+        .catch(function () {
+          setErr('Could not load fields.');
+          listEl.innerHTML = '';
+        });
+    });
+  }
+
+  if (selectAll && listEl) {
+    selectAll.addEventListener('change', function () {
+      var on = selectAll.checked;
+      listEl.querySelectorAll('input[type="checkbox"]').forEach(function (cb) { cb.checked = on; });
+    });
+  }
+
+  if (dlBtn && ctSelect && downloadUrl && listEl) {
+    dlBtn.addEventListener('click', function () {
+      setErr('');
+      var names = [];
+      listEl.querySelectorAll('input[type="checkbox"]:checked').forEach(function (cb) { names.push(cb.value); });
+      if (!names.length) {
+        setErr('Select at least one field.');
+        return;
+      }
+      var fd = new FormData();
+      fd.append('csrfmiddlewaretoken', csrfToken());
+      fd.append('content_type_id', ctSelect.value);
+      names.forEach(function (n) { fd.append('fields', n); });
+      fetch(downloadUrl, { method: 'POST', body: fd, credentials: 'same-origin' })
+        .then(function (r) {
+          var ct = (r.headers.get('Content-Type') || '').toLowerCase();
+          if (ct.indexOf('application/json') !== -1) {
+            return r.json().then(function (j) { throw new Error(j.error || 'Download failed'); });
+          }
+          if (!r.ok) throw new Error('Download failed (' + r.status + ')');
+          var disp = r.headers.get('Content-Disposition') || '';
+          var fname = 'import_template.csv';
+          var m = /filename="([^"]+)"/.exec(disp);
+          if (m) fname = m[1];
+          return r.blob().then(function (blob) { return { blob: blob, fname: fname }; });
+        })
+        .then(function (res) {
+          var a = document.createElement('a');
+          a.href = URL.createObjectURL(res.blob);
+          a.download = res.fname;
+          a.rel = 'noopener';
+          document.body.appendChild(a);
+          a.click();
+          URL.revokeObjectURL(a.href);
+          a.remove();
+          closeModal();
+        })
+        .catch(function (e) {
+          setErr(e.message || 'Download failed');
+        });
+    });
+  }
+
+  if (modal) {
+    modal.querySelectorAll('[data-close-template-modal]').forEach(function (el) {
+      el.addEventListener('click', closeModal);
+    });
+    modal.addEventListener('click', function (e) {
+      if (e.target === modal) closeModal();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && modal.classList.contains('is-open')) closeModal();
+    });
+  }
+})();
+</script>
+{% include 'desk/includes/tom_select_desk_scripts.html' %}
+{% endblock %}

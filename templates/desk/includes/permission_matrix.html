@@ -1,0 +1,55 @@
+{# Reusable permission grid (Add / Change / Delete / View + extras). Expects: matrix_field_name, permission_rows, selected_perm_pks; optional: legend, hint, matrix_errors #}
+<div class="desk-field desk-field--full">
+  {% if legend %}<span class="desk-field__legend">{{ legend }}</span>{% endif %}
+  {% if hint %}<p class="desk-field__hint">{{ hint }}</p>{% endif %}
+  <div class="desk-perm-matrix-wrap">
+    <table class="desk-perm-matrix">
+      <thead>
+        <tr>
+          <th scope="col" class="desk-perm-matrix__col-model">Model</th>
+          <th scope="col">Add</th>
+          <th scope="col">Change</th>
+          <th scope="col">Delete</th>
+          <th scope="col">View</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in permission_rows %}
+        <tr>
+          <th scope="row" class="desk-perm-matrix__model">
+            <div class="desk-perm-matrix__model-title">{{ row.label }}</div>
+            {% if row.extras %}
+            <div class="desk-perm-matrix__model-extras">
+              {% for ep in row.extras %}
+              <label class="desk-perm-matrix__cb desk-perm-matrix__cb--stack"><input type="checkbox" name="{{ matrix_field_name }}" value="{{ ep.pk }}" {% if ep.pk in selected_perm_pks %}checked{% endif %}><span>{{ ep.name }}</span></label>
+              {% endfor %}
+            </div>
+            {% endif %}
+          </th>
+          <td class="desk-perm-matrix__cell">
+            {% if row.add %}
+            <label class="desk-perm-matrix__cb"><input type="checkbox" name="{{ matrix_field_name }}" value="{{ row.add.pk }}" {% if row.add.pk in selected_perm_pks %}checked{% endif %}><span>Add</span></label>
+            {% else %}<span class="desk-perm-matrix__na">—</span>{% endif %}
+          </td>
+          <td class="desk-perm-matrix__cell">
+            {% if row.change %}
+            <label class="desk-perm-matrix__cb"><input type="checkbox" name="{{ matrix_field_name }}" value="{{ row.change.pk }}" {% if row.change.pk in selected_perm_pks %}checked{% endif %}><span>Change</span></label>
+            {% else %}<span class="desk-perm-matrix__na">—</span>{% endif %}
+          </td>
+          <td class="desk-perm-matrix__cell">
+            {% if row.delete %}
+            <label class="desk-perm-matrix__cb"><input type="checkbox" name="{{ matrix_field_name }}" value="{{ row.delete.pk }}" {% if row.delete.pk in selected_perm_pks %}checked{% endif %}><span>Delete</span></label>
+            {% else %}<span class="desk-perm-matrix__na">—</span>{% endif %}
+          </td>
+          <td class="desk-perm-matrix__cell">
+            {% if row.view %}
+            <label class="desk-perm-matrix__cb"><input type="checkbox" name="{{ matrix_field_name }}" value="{{ row.view.pk }}" {% if row.view.pk in selected_perm_pks %}checked{% endif %}><span>View</span></label>
+            {% else %}<span class="desk-perm-matrix__na">—</span>{% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% if matrix_errors %}<div class="desk-field__errors">{{ matrix_errors }}</div>{% endif %}
+</div>

@@ -1,0 +1,255 @@
+{% extends 'desk/base.html' %}
+
+{% block title %}Users · Fairdee Finance{% endblock %}
+{% block topbar_title %}Users{% endblock %}
+
+{% block workspace %}
+<div class="desk-page-head">
+  <div class="desk-page-head__crumb">
+    <a href="{% url 'desk:home' %}">Home</a>
+    · Accounts
+  </div>
+  <h1 class="desk-page-head__title">Users</h1>
+</div>
+
+<form method="post" action="{% url 'desk:user_list' %}" id="desk-user-bulk-form" class="desk-document-bulk">
+  {% csrf_token %}
+  <input type="hidden" name="desk_bulk_action" value="" id="desk-bulk-action-input">
+
+  <div class="desk-toolbar desk-toolbar--bulk">
+    <div class="desk-bulk-bar" id="desk-bulk-bar" hidden>
+      <span class="desk-bulk-bar__count" id="desk-bulk-count">0 selected</span>
+      {% if can_delete %}
+      <div class="desk-dropdown" id="desk-bulk-dropdown">
+        <button type="button" class="desk-btn desk-btn--secondary" id="desk-bulk-actions-btn" aria-expanded="false" aria-haspopup="true">
+          Actions
+        </button>
+        <div class="desk-dropdown__menu" id="desk-bulk-dropdown-menu" role="menu" hidden>
+          <button type="button" class="desk-dropdown__item desk-dropdown__item--danger" id="desk-bulk-delete-btn" role="menuitem">
+            Delete
+          </button>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+    <div class="desk-toolbar__end">
+      {% if perms.accounts.add_user %}
+      <button type="button" class="desk-btn desk-btn--primary" data-open-user-modal>Add user</button>
+      {% endif %}
+      {% if user.is_staff %}
+      <a class="desk-btn desk-btn--secondary" href="/admin/accounts/user/">Open in Admin</a>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="desk-table-wrap">
+    {% if users %}
+    <table class="desk-table desk-table--bulk">
+      <thead>
+        <tr>
+          <th class="desk-table__check" scope="col">
+            <input type="checkbox" id="desk-select-all" class="desk-table__check-input" title="Select all" aria-label="Select all rows">
+          </th>
+          <th>Email</th>
+          <th>Company</th>
+          <th>Groups</th>
+          <th>Active</th>
+          <th>Staff</th>
+          <th>Superuser</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for u in users %}
+        <tr>
+          <td class="desk-table__check">
+            <input type="checkbox" name="selected" value="{{ u.pk }}" class="desk-row-check desk-table__check-input" aria-label="Select {{ u.email }}">
+          </td>
+          <td>{{ u.email }}</td>
+          <td>{% if u.company %}{{ u.company.name }}{% else %}—{% endif %}</td>
+          <td class="desk-table__muted">{% for g in u.groups.all %}{{ g.name }}{% if not forloop.last %}, {% endif %}{% empty %}—{% endfor %}</td>
+          <td>{% if u.is_active %}<span class="desk-badge">Yes</span>{% else %}<span class="desk-badge desk-badge--muted">No</span>{% endif %}</td>
+          <td>{% if u.is_staff %}<span class="desk-badge">Yes</span>{% else %}<span class="desk-badge desk-badge--muted">No</span>{% endif %}</td>
+          <td>{% if u.is_superuser %}<span class="desk-badge">Yes</span>{% else %}<span class="desk-badge desk-badge--muted">No</span>{% endif %}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="desk-empty">No users in scope.</div>
+    {% endif %}
+  </div>
+</form>
+
+<script>
+(function () {
+  var form = document.getElementById('desk-user-bulk-form');
+  if (!form) return;
+  var bar = document.getElementById('desk-bulk-bar');
+  var countEl = document.getElementById('desk-bulk-count');
+  var selectAll = document.getElementById('desk-select-all');
+  var rowChecks = function () { return form.querySelectorAll('.desk-row-check'); };
+  var actionInput = document.getElementById('desk-bulk-action-input');
+  var dropBtn = document.getElementById('desk-bulk-actions-btn');
+  var dropMenu = document.getElementById('desk-bulk-dropdown-menu');
+  var deleteBtn = document.getElementById('desk-bulk-delete-btn');
+
+  function selectedCount() {
+    var n = 0;
+    rowChecks().forEach(function (cb) { if (cb.checked) n++; });
+    return n;
+  }
+
+  function syncBar() {
+    var n = selectedCount();
+    if (!bar || !countEl) return;
+    if (n > 0) {
+      bar.hidden = false;
+      countEl.textContent = n + (n === 1 ? ' row selected' : ' rows selected');
+    } else {
+      bar.hidden = true;
+      if (dropMenu) dropMenu.hidden = true;
+      if (dropBtn) dropBtn.setAttribute('aria-expanded', 'false');
+    }
+    if (selectAll) {
+      var all = rowChecks();
+      var allChecked = all.length && selectedCount() === all.length;
+      selectAll.checked = allChecked;
+      selectAll.indeterminate = selectedCount() > 0 && !allChecked;
+    }
+  }
+
+  rowChecks().forEach(function (cb) {
+    cb.addEventListener('change', syncBar);
+  });
+  if (selectAll) {
+    selectAll.addEventListener('change', function () {
+      var on = selectAll.checked;
+      rowChecks().forEach(function (cb) { cb.checked = on; });
+      syncBar();
+    });
+  }
+
+  if (dropBtn && dropMenu) {
+    dropBtn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var open = dropMenu.hidden === false;
+      dropMenu.hidden = open;
+      dropBtn.setAttribute('aria-expanded', open ? 'false' : 'true');
+    });
+    document.addEventListener('click', function () {
+      dropMenu.hidden = true;
+      dropBtn.setAttribute('aria-expanded', 'false');
+    });
+    dropMenu.addEventListener('click', function (e) { e.stopPropagation(); });
+  }
+
+  if (deleteBtn && actionInput) {
+    deleteBtn.addEventListener('click', function () {
+      if (selectedCount() === 0) return;
+      if (!confirm('Delete the selected user(s)? This cannot be undone.')) return;
+      actionInput.value = 'delete';
+      form.submit();
+    });
+  }
+})();
+</script>
+
+{% if create_form %}
+<div
+  id="user-create-modal"
+  class="desk-modal{% if create_form.errors %} is-open{% endif %}"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="user-create-modal-title"
+  aria-hidden="{% if create_form.errors %}false{% else %}true{% endif %}"
+>
+  <div class="desk-modal__panel desk-modal__panel--wide">
+    <div class="desk-modal__head">
+      <h2 id="user-create-modal-title" class="desk-modal__title">New user</h2>
+      <button type="button" class="desk-modal__close" data-close-modal aria-label="Close">&times;</button>
+    </div>
+    <form method="post" action="{% url 'desk:user_list' %}" class="desk-modal__form">
+      {% csrf_token %}
+      {% if create_form.non_field_errors %}
+      <ul class="desk-errorlist desk-errorlist--compact">
+        {% for err in create_form.non_field_errors %}<li>{{ err }}</li>{% endfor %}
+      </ul>
+      {% endif %}
+      <div class="desk-modal__grid">
+        <div class="desk-field">
+          <label for="{{ create_form.email.id_for_label }}">{{ create_form.email.label }}</label>
+          {{ create_form.email }}
+          {% if create_form.email.errors %}<div class="desk-field__errors">{{ create_form.email.errors }}</div>{% endif %}
+        </div>
+        {% if 'company' in create_form.fields %}
+        <div class="desk-field">
+          <label for="{{ create_form.company.id_for_label }}">{{ create_form.company.label }}</label>
+          {{ create_form.company }}
+          {% if create_form.company.errors %}<div class="desk-field__errors">{{ create_form.company.errors }}</div>{% endif %}
+        </div>
+        {% endif %}
+        <div class="desk-field">
+          <label for="{{ create_form.password1.id_for_label }}">{{ create_form.password1.label }}</label>
+          {{ create_form.password1 }}
+          {% if create_form.password1.errors %}<div class="desk-field__errors">{{ create_form.password1.errors }}</div>{% endif %}
+        </div>
+        <div class="desk-field">
+          <label for="{{ create_form.password2.id_for_label }}">{{ create_form.password2.label }}</label>
+          {{ create_form.password2 }}
+          {% if create_form.password2.errors %}<div class="desk-field__errors">{{ create_form.password2.errors }}</div>{% endif %}
+        </div>
+        <div class="desk-field desk-field--full">
+          <span class="desk-field__legend">{{ create_form.groups.label }}</span>
+          <p class="desk-field__hint">Select groups in the grid (four per row). Group permissions apply to the new user.</p>
+          <div class="desk-group-grid">
+            {% for g in all_groups %}
+            <label class="desk-group-grid__cell">
+              <input type="checkbox" name="groups" value="{{ g.pk }}" {% if g.pk in selected_group_pks %}checked{% endif %}>
+              <span>{{ g.name }}</span>
+            </label>
+            {% empty %}
+            <p class="desk-field__hint">No groups defined yet. Create groups in Admin.</p>
+            {% endfor %}
+          </div>
+          {% if create_form.groups.errors %}<div class="desk-field__errors">{{ create_form.groups.errors }}</div>{% endif %}
+        </div>
+        {% include "desk/includes/permission_matrix.html" with matrix_field_name="user_permissions" legend=create_form.user_permissions.label hint="One row per model. Columns are Add, Change, Delete, and View. Extra permissions for that model (if any) are listed under the model name." permission_rows=permission_rows selected_perm_pks=selected_perm_pks matrix_errors=create_form.user_permissions.errors %}
+      </div>
+      <div class="desk-modal__actions">
+        <button type="button" class="desk-btn desk-btn--secondary" data-close-modal>Cancel</button>
+        <button type="submit" class="desk-btn desk-btn--primary">Create user</button>
+      </div>
+    </form>
+  </div>
+</div>
+<script>
+(function () {
+  var modal = document.getElementById('user-create-modal');
+  if (!modal) return;
+  var openBtn = document.querySelector('[data-open-user-modal]');
+  var closeEls = modal.querySelectorAll('[data-close-modal]');
+  function open() {
+    modal.classList.add('is-open');
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('desk-modal-open');
+  }
+  function close() {
+    modal.classList.remove('is-open');
+    modal.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('desk-modal-open');
+  }
+  if (openBtn) openBtn.addEventListener('click', open);
+  closeEls.forEach(function (el) { el.addEventListener('click', close); });
+  modal.addEventListener('click', function (e) {
+    if (e.target === modal) close();
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && modal.classList.contains('is-open')) close();
+  });
+  if (modal.classList.contains('is-open')) {
+    document.body.classList.add('desk-modal-open');
+  }
+})();
+</script>
+{% endif %}
+{% endblock %}

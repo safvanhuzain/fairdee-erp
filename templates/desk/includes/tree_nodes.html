@@ -1,0 +1,27 @@
+{% for node in nodes %}
+<li class="desk-tree__node{% if node.disabled %} desk-tree__node--disabled{% endif %}{% if node.is_group %} desk-tree__node--group{% endif %}" role="treeitem" aria-expanded="{% if node.children %}true{% else %}false{% endif %}">
+  {% if node.children %}
+  <details class="desk-tree__branch" open>
+    <summary class="desk-tree__summary">
+      <span class="desk-tree__main">
+        <span class="desk-tree__label">{{ node.label }}</span>
+        {% if node.subtitle %}<span class="desk-tree__code">{{ node.subtitle }}</span>{% endif %}
+      </span>
+      {% if node.edit_url %}<a class="desk-tree__edit desk-link-edit" href="{{ node.edit_url }}">Edit</a>{% endif %}
+    </summary>
+    <ul class="desk-tree desk-tree--nested" role="group">
+      {% include 'desk/includes/tree_nodes.html' with nodes=node.children only %}
+    </ul>
+  </details>
+  {% else %}
+  <div class="desk-tree__leaf">
+    <span class="desk-tree__leaf-marker" aria-hidden="true"></span>
+    <span class="desk-tree__main">
+      <span class="desk-tree__label">{{ node.label }}</span>
+      {% if node.subtitle %}<span class="desk-tree__code">{{ node.subtitle }}</span>{% endif %}
+    </span>
+    {% if node.edit_url %}<a class="desk-tree__edit desk-link-edit" href="{{ node.edit_url }}">Edit</a>{% endif %}
+  </div>
+  {% endif %}
+</li>
+{% endfor %}

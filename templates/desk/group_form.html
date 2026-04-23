@@ -1,0 +1,39 @@
+{% extends 'desk/base.html' %}
+
+{% block title %}{{ page_title }} · Fairdee Finance{% endblock %}
+{% block topbar_title %}{{ page_title }}{% endblock %}
+
+{% block workspace %}
+<div class="desk-page-head">
+  <div class="desk-page-head__crumb">
+    <a href="{% url 'desk:home' %}">Home</a>
+    · {{ page_subtitle }}
+    · <a href="{{ list_url }}">{{ doctype_plural }}</a>
+  </div>
+  <h1 class="desk-page-head__title">{{ page_title }}</h1>
+</div>
+
+<form method="post" action="" class="desk-doc-form desk-doc-form--wide">
+  {% csrf_token %}
+  {% if form.non_field_errors %}
+  <ul class="desk-errorlist">
+    {% for err in form.non_field_errors %}<li>{{ err }}</li>{% endfor %}
+  </ul>
+  {% endif %}
+
+  <div class="desk-doc-form__grid">
+    <div class="desk-field desk-field--full">
+      <label for="{{ form.name.id_for_label }}">{{ form.name.label }}</label>
+      {{ form.name }}
+      {% if form.name.errors %}<div class="desk-field__errors">{{ form.name.errors }}</div>{% endif %}
+    </div>
+  </div>
+
+  {% include "desk/includes/permission_matrix.html" with matrix_field_name=matrix_field_name legend=form.permissions.label hint="One row per model. Columns are Add, Change, Delete, and View. Extra permissions for that model (if any) are listed under the model name." permission_rows=permission_rows selected_perm_pks=selected_perm_pks matrix_errors=form.permissions.errors %}
+
+  <div class="desk-modal__actions desk-doc-form__actions">
+    <a class="desk-btn desk-btn--secondary" href="{{ list_url }}">Cancel</a>
+    <button type="submit" class="desk-btn desk-btn--primary">{{ submit_label }}</button>
+  </div>
+</form>
+{% endblock %}

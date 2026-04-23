@@ -1,0 +1,68 @@
+{% extends 'desk/base.html' %}
+{% load desk_tags %}
+
+{% block title %}{{ page_title }} · Fairdee Finance{% endblock %}
+{% block topbar_title %}{{ page_title }}{% endblock %}
+
+{% block workspace %}
+<div class="desk-page-head">
+  <div class="desk-page-head__crumb">
+    <a href="{% url 'desk:home' %}">Home</a>
+    · {{ page_subtitle }}
+  </div>
+  <h1 class="desk-page-head__title">{{ page_title }}</h1>
+</div>
+
+<div class="desk-toolbar">
+  <div>
+    {% if user.is_staff %}
+    <a class="desk-btn desk-btn--secondary" href="{{ admin_url }}">Open in Admin</a>
+    {% endif %}
+  </div>
+</div>
+
+<div class="desk-table-wrap">
+  {% if rows %}
+  <table class="desk-table">
+    <thead>
+      <tr>
+        {% for col in columns %}
+        <th>{{ col.label }}</th>
+        {% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in rows %}
+      <tr>
+        {% for col in columns %}
+        <td>
+          {% if col.key == 'status' %}
+            <span class="desk-badge">{{ row|desk_cell:col.key }}</span>
+          {% elif col.key == 'is_active' %}
+            {% if row.is_active %}<span class="desk-badge">Active</span>{% else %}<span class="desk-badge desk-badge--muted">Inactive</span>{% endif %}
+          {% else %}
+            {{ row|desk_cell:col.key }}
+          {% endif %}
+        </td>
+        {% endfor %}
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="desk-empty">No records yet. Use Admin to add data.</div>
+  {% endif %}
+</div>
+
+{% if is_paginated %}
+<div class="desk-pagination">
+  {% if page_obj.has_previous %}
+  <a href="?page={{ page_obj.previous_page_number }}">Previous</a>
+  {% endif %}
+  <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+  {% if page_obj.has_next %}
+  <a href="?page={{ page_obj.next_page_number }}">Next</a>
+  {% endif %}
+</div>
+{% endif %}
+{% endblock %}

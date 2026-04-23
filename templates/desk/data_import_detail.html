@@ -1,0 +1,60 @@
+{% extends 'desk/base.html' %}
+
+{% block title %}{{ page_title }} · Fairdee Finance{% endblock %}
+{% block topbar_title %}{{ page_title }}{% endblock %}
+
+{% block workspace %}
+<div class="desk-page-head">
+  <div class="desk-page-head__crumb">
+    <a href="{% url 'desk:home' %}">Home</a>
+    · {{ page_subtitle }}
+    · <a href="{{ list_url }}">{{ doctype_plural }}</a>
+  </div>
+  <h1 class="desk-page-head__title">{{ page_title }}</h1>
+</div>
+
+<div class="desk-import-detail">
+  <dl class="desk-import-detail__meta">
+    <div><dt>Target model</dt><dd>{{ import_obj.content_type.app_label }}.{{ import_obj.content_type.model }}</dd></div>
+    <div><dt>Mode</dt><dd>{{ import_obj.get_mode_display }}</dd></div>
+    <div><dt>Status</dt><dd><span class="desk-badge">{{ import_obj.get_status_display }}</span></dd></div>
+    <div><dt>Created</dt><dd>{{ import_obj.created_at }}</dd></div>
+    <div><dt>Rows created</dt><dd>{{ import_obj.rows_created }}</dd></div>
+    <div><dt>Rows updated</dt><dd>{{ import_obj.rows_updated }}</dd></div>
+    <div><dt>Rows failed</dt><dd>{{ import_obj.rows_failed }}</dd></div>
+    {% if import_obj.attachment %}
+    <div><dt>Attachment</dt><dd><a href="{{ import_obj.attachment.url }}" target="_blank" rel="noopener">Download CSV</a></dd></div>
+    {% endif %}
+  </dl>
+
+  <h2 class="desk-import-detail__errors-title">Import errors</h2>
+  {% if error_report %}
+  <div class="desk-table-wrap">
+    <table class="desk-table">
+      <thead>
+        <tr>
+          <th scope="col">Row</th>
+          <th scope="col">Column</th>
+          <th scope="col">Message</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for err in error_report %}
+        <tr>
+          <td>{{ err.row }}</td>
+          <td>{% if err.column %}{{ err.column }}{% else %}—{% endif %}</td>
+          <td>{{ err.message }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p class="desk-muted">No row-level errors recorded.</p>
+  {% endif %}
+
+  <div class="desk-modal__actions desk-doc-form__actions">
+    <a class="desk-btn desk-btn--secondary" href="{{ list_url }}">Back to list</a>
+  </div>
+</div>
+{% endblock %}

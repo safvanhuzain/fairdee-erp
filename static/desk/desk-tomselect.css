@@ -1,0 +1,125 @@
+/* Tom Select — align with desk form controls (dropdown panel is custom, not OS native). */
+
+/*
+ * Tom Select inserts the wrapper *after* the native <select> (siblings), not inside it.
+ * Hide the real select completely so desk-modal-select border/chevron does not stack on .ts-control.
+ */
+.desk-doc-form .desk-field {
+  position: relative;
+}
+
+.desk-doc-form .ts-wrapper {
+  width: 100%;
+  min-width: 0;
+  position: relative;
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.desk-doc-form .desk-field .ts-wrapper.single {
+  max-width: 420px;
+}
+
+.desk-doc-form--two-col .desk-field .ts-wrapper.single {
+  max-width: 100%;
+}
+
+.desk-doc-form select.desk-modal-select:not([multiple]).tomselected {
+  position: absolute !important;
+  left: -9999px !important;
+  top: 0 !important;
+  width: 1px !important;
+  height: 1px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  clip-path: inset(50%) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  background: transparent none !important;
+  background-image: none !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+.desk-doc-form .ts-wrapper.single .ts-control {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+  background: #fff;
+  background-image: none;
+  min-height: 34px;
+  padding: 6px 32px 6px 10px;
+  font-size: 14px;
+  line-height: 1.35;
+  color: #374151;
+}
+
+.desk-doc-form .ts-wrapper.single .ts-control:hover {
+  border-color: #d1d5db;
+}
+
+.desk-doc-form .ts-wrapper.single.focus .ts-control,
+.desk-doc-form .ts-wrapper.single.dropdown-active .ts-control {
+  outline: none;
+  border-color: var(--desk-primary);
+  box-shadow: 0 0 0 3px rgba(36, 144, 239, 0.12), 0 4px 14px rgba(15, 23, 42, 0.06);
+}
+
+.desk-doc-form .ts-wrapper.single .ts-control:after {
+  right: 10px;
+  margin-top: -2px;
+  border-color: var(--desk-primary) transparent transparent;
+  opacity: 0.85;
+}
+
+.desk-doc-form .ts-wrapper.single.dropdown-active .ts-control:after {
+  border-color: transparent transparent var(--desk-primary);
+}
+
+/* Panel is appended to body so it is not clipped by the form grid. */
+body > .ts-dropdown {
+  border: 1px solid var(--desk-border);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  margin-top: 4px;
+  z-index: 5000;
+  overflow: hidden;
+  font-family: var(--desk-font);
+}
+
+body > .ts-dropdown .option {
+  padding: 8px 12px;
+  font-size: 14px;
+}
+
+body > .ts-dropdown .active {
+  background: rgba(36, 144, 239, 0.1);
+  color: var(--desk-text);
+}
+
+body > .ts-dropdown .option:hover,
+body > .ts-dropdown [data-selectable].option:hover {
+  background: #f3f4f6;
+}
+
+body > .ts-dropdown .ts-dropdown-content {
+  max-height: 280px;
+}
+
+body > .ts-dropdown .optgroup-header {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--desk-muted);
+  padding: 8px 12px 4px;
+  background: #fafbfc;
+}
+
+body > .ts-dropdown .optgroup {
+  border-top-color: var(--desk-border);
+}
