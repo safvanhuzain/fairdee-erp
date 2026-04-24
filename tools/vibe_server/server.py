@@ -94,6 +94,23 @@ def _safe_commit_message(raw: str) -> str:
     return (line[:240] if line else "Flow: changes") or "Flow: changes"
 
 
+def _unmerged_paths(repo: Path) -> list[str]:
+    """Paths with unresolved merge entries in the index (git ls-files -u)."""
+    r = _git_run(["ls-files", "-u"], repo, timeout=60.0)
+    if r.returncode != 0:
+        return []
+    seen: set[str] = set()
+    out: list[str] = []
+    for line in (r.stdout or "").splitlines():
+        if "\t" not in line:
+            continue
+        path = line.rsplit("\t", 1)[-1].strip()
+        if path and path not in seen:
+            seen.add(path)
+            out.append(path)
+    return out
+
+
 def _resolve_origin_base(repo: Path) -> str:
     pref = (os.environ.get("FLOW_GITHUB_BASE_BRANCH") or "").strip()
     candidates = [b for b in (pref, "develop", "main", "master") if b]
@@ -113,16 +130,20 @@ def _resolve_origin_base(repo: Path) -> str:
 def _resolve_unmerged_take_worktree(repo: Path) -> None:
     """Mark unmerged paths resolved: keep working tree file if present, else record deletion."""
     for _ in range(80):
-        r = _git_run(["diff", "--name-only", "--diff-filter=U"], repo, timeout=60.0)
-        unmerged = [x.strip() for x in (r.stdout or "").splitlines() if x.strip()]
+        unmerged = _unmerged_paths(repo)
         if not unmerged:
             return
         for path in unmerged:
             fp = repo / path
             if fp.exists():
-                _git_run(["add", "--", path], repo, timeout=60.0)
+                ar = _git_run(["add", "--", path], repo, timeout=60.0)
             else:
-                _git_run(["rm", "-f", "--", path], repo, timeout=60.0)
+                ar = _git_run(["rm", "-f", "--", path], repo, timeout=60.0)
+            if ar.returncode != 0:
+                raise FlowGitError(
+                    f"Could not stage resolution for {path}: "
+                    + ((ar.stderr or ar.stdout) or "git add/rm failed").strip()[:400],
+                )
     raise FlowGitError("Could not clear merge conflicts (too many rounds)")
 
 
@@ -177,15 +198,29 @@ def _github_publish_sync(commit_message: str) -> dict[str, str | bool]:
         if ad0.returncode != 0:
             raise FlowGitError((ad0.stderr or ad0.stdout or "git add failed after conflict").strip()[:800])
         _resolve_unmerged_take_worktree(repo)
-        still = _git_run(["diff", "--name-only", "--diff-filter=U"], repo, timeout=30.0).stdout.strip()
+        still = _unmerged_paths(repo)
         if still:
             raise FlowGitError(
-                "Unresolved paths after auto-resolve: " + still[:600],
+                "Unresolved paths after auto-resolve: " + " ".join(still)[:600],
             )
 
     ad = _git_run(["add", "--"] + paths, repo, timeout=60.0)
     if ad.returncode != 0:
         raise FlowGitError((ad.stderr or ad.stdout or "git add failed").strip()[:800])
+
+    # Stash pop can leave the index in "needs merge" until paths are re-staged; clear before commit.
+    if _unmerged_paths(repo):
+        auto_resolved = True
+        _resolve_unmerged_take_worktree(repo)
+        ad_pre = _git_run(["add", "--"] + paths, repo, timeout=60.0)
+        if ad_pre.returncode != 0:
+            raise FlowGitError((ad_pre.stderr or ad_pre.stdout or "git add failed").strip()[:800])
+        _resolve_unmerged_take_worktree(repo)
+        still_pre = _unmerged_paths(repo)
+        if still_pre:
+            raise FlowGitError(
+                "Unresolved paths before commit: " + " ".join(still_pre)[:600],
+            )
 
     dq = _git_run(["diff", "--cached", "--quiet"], repo, timeout=30.0)
     if dq.returncode == 0:
