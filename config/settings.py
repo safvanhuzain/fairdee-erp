@@ -45,6 +45,16 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+# Flow (tools/vibe_server) serves the UI on :8765 and iframes the desk on :8000. Different
+# ports are different origins, so X-Frame-Options (DENY / SAMEORIGIN) blocks the preview.
+# In local DEBUG, omit clickjacking middleware unless explicitly re-enabled.
+_iframe_deny = os.environ.get('DJANGO_IFRAME_DENY', '').lower() in ('1', 'true', 'yes')
+if DEBUG and not _iframe_deny:
+    MIDDLEWARE = [
+        m for m in MIDDLEWARE
+        if m != 'django.middleware.clickjacking.XFrameOptionsMiddleware'
+    ]
+
 ROOT_URLCONF = 'config.urls'
 
 TEMPLATES = [
