@@ -1,0 +1,201 @@
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - heading "Fairdee · Flow" [level=1] [ref=e4]
+    - paragraph [ref=e5]:
+      - text: Preview the desk, write
+      - strong [ref=e6]: Plain text
+      - text: for Cursor, then
+      - strong [ref=e7]: Handoff
+      - text: . Optional Playwright smoke below.
+    - region "Plain text" [ref=e8]:
+      - heading "Plain text" [level=2] [ref=e9]
+      - paragraph [ref=e10]:
+        - text: Your change request only. Sent to smoke as
+        - code [ref=e11]: FAIRDEE_FLOW_PROMPT
+        - text: when you run smoke.
+      - generic [ref=e12]: Plain text change request
+      - textbox "Plain text change request" [ref=e13]:
+        - /placeholder: Describe the change you want in fairdee-erp…
+    - region "Handoff · Cursor / Engineering" [ref=e14]:
+      - heading "Handoff · Cursor / Engineering" [level=2] [ref=e15]
+      - paragraph [ref=e16]:
+        - text: Builds markdown (repo root + agent steps) and opens
+        - link "Cursor" [ref=e17] [cursor=pointer]:
+          - /url: https://cursor.com
+        - text: ’s prompt link.
+        - strong [ref=e18]: Engineering
+        - text: adds an extra checklist block (no GitHub PR automation).
+      - generic [ref=e19]:
+        - button "Handoff → Cursor" [ref=e20] [cursor=pointer]
+        - button "Handoff → Engineering" [ref=e21] [cursor=pointer]
+        - button "Copy handoff markdown" [ref=e22] [cursor=pointer]
+      - status [ref=e23]
+    - separator [ref=e24]
+    - heading "Desk smoke (Playwright)" [level=2] [ref=e25]
+    - paragraph [ref=e26]:
+      - text: Workspace heading must read
+      - strong [ref=e27]: Hello User
+      - text: . Run Django on
+      - code [ref=e28]: http://127.0.0.1:8000
+      - text: or set base URL below.
+    - list [ref=e29]:
+      - listitem [ref=e30]:
+        - code [ref=e31]: python manage.py runserver
+      - listitem [ref=e32]:
+        - code [ref=e33]: FAIRDEE_SMOKE_EMAIL
+        - text: /
+        - code [ref=e34]: FAIRDEE_SMOKE_PASSWORD
+        - text: or form
+    - paragraph [ref=e35]: Credentials are sent only to this localhost server as JSON.
+    - generic [ref=e36]:
+      - textbox "Email" [ref=e37]
+      - textbox "Password" [ref=e38]
+      - textbox "Base URL (optional)" [ref=e39]
+    - button "Run smoke" [ref=e40] [cursor=pointer]
+  - generic [ref=e41]:
+    - generic [ref=e42]:
+      - generic [ref=e43]: Preview
+      - textbox "Django app URL" [ref=e44]: http://127.0.0.1:8000/app/
+      - button "Reload" [ref=e45] [cursor=pointer]
+      - link "Open in tab" [ref=e46] [cursor=pointer]:
+        - /url: http://127.0.0.1:8000/app/
+    - status [ref=e47]: Flow server reached 127.0.0.1:8000 (TCP). If the iframe still shows refused, this browser cannot reach that address — use Open in tab. Embedded/remote browsers often use a different localhost.
+    - region "Preview troubleshooting" [ref=e48]:
+      - paragraph [ref=e49]:
+        - strong [ref=e50]: Refused to connect
+        - text: means nothing is accepting connections on that URL from
+        - emphasis [ref=e51]: this
+        - text: browser (Django not running, wrong port, or a remote/automation browser where
+        - code [ref=e52]: 127.0.0.1
+        - text: is not your Mac).
+      - paragraph [ref=e53]:
+        - strong [ref=e54]: "Fix:"
+        - code [ref=e55]: python manage.py runserver 127.0.0.1:8000
+        - text: then Reload.
+      - paragraph [ref=e56]:
+        - text: If the URL works in a
+        - strong [ref=e57]: new tab
+        - text: but not inside this preview, the browser blocked the
+        - strong [ref=e58]: iframe
+        - text: (usually
+        - code [ref=e59]: X-Frame-Options
+        - text: from Django — not CORS). With
+        - code [ref=e60]: DEBUG
+        - text: ", this project skips the clickjacking middleware for local dev so Flow can embed the app. Restart Django after config changes; set"
+        - code [ref=e61]: DJANGO_IFRAME_DENY=1
+        - text: to keep framing protection.
+      - paragraph [ref=e62]:
+        - text: If the green banner says Flow reached the port but the iframe still shows "refused", use
+        - strong [ref=e63]: Open in tab
+        - text: (embedded browsers may not reach your Mac's
+        - code [ref=e64]: 127.0.0.1
+        - text: ). Override the preview URL with env
+        - code [ref=e65]: FAIRDEE_FLOW_PREVIEW_URL
+        - text: when starting Flow.
+    - iframe [ref=e66]:
+      - generic [ref=f13e2]:
+        - complementary "Main navigation" [ref=f13e3]:
+          - generic [ref=f13e4]:
+            - generic [ref=f13e5]: F
+            - generic [ref=f13e6]: Fairdee Finance
+          - generic [ref=f13e7]:
+            - generic [ref=f13e8]: Workspace
+            - navigation [ref=f13e9]:
+              - link "Home" [ref=f13e10] [cursor=pointer]:
+                - /url: /app/
+                - img [ref=f13e11]
+                - text: Home
+            - generic [ref=f13e14]: Core
+            - navigation [ref=f13e15]:
+              - link "Companies" [ref=f13e16] [cursor=pointer]:
+                - /url: /app/core/company/
+                - img [ref=f13e17]
+                - text: Companies
+              - link "Countries" [ref=f13e20] [cursor=pointer]:
+                - /url: /app/core/country/
+                - img [ref=f13e21]
+                - text: Countries
+              - link "Currencies" [ref=f13e24] [cursor=pointer]:
+                - /url: /app/core/currency/
+                - img [ref=f13e25]
+                - text: Currencies
+            - generic [ref=f13e28]: Accounts
+            - navigation [ref=f13e29]:
+              - link "Users" [ref=f13e30] [cursor=pointer]:
+                - /url: /app/accounts/user/
+                - img [ref=f13e31]
+                - text: Users
+              - link "Groups" [ref=f13e34] [cursor=pointer]:
+                - /url: /app/auth/group/
+                - img [ref=f13e35]
+                - text: Groups
+            - generic [ref=f13e38]: Finance
+            - navigation [ref=f13e39]:
+              - link "Accounts" [ref=f13e40] [cursor=pointer]:
+                - /url: /app/finance/account/
+                - img [ref=f13e41]
+                - text: Accounts
+              - link "Cost Centers" [ref=f13e44] [cursor=pointer]:
+                - /url: /app/finance/costcenter/
+                - img [ref=f13e45]
+                - text: Cost Centers
+            - generic [ref=f13e48]: Desk
+            - navigation [ref=f13e49]:
+              - link "Data Imports" [ref=f13e50] [cursor=pointer]:
+                - /url: /app/desk/dataimport/
+                - img [ref=f13e51]
+                - text: Data Imports
+          - generic [ref=f13e54]:
+            - link "Django Admin" [ref=f13e55] [cursor=pointer]:
+              - /url: /admin/
+            - text: ·
+            - link "Log out" [ref=f13e56] [cursor=pointer]:
+              - /url: /logout/
+        - generic [ref=f13e57]:
+          - banner [ref=f13e58]:
+            - generic [ref=f13e59]: Home
+            - generic [ref=f13e61]:
+              - generic [ref=f13e62]: E
+              - generic [ref=f13e63]: e2e@fairdee.local
+          - main [ref=f13e64]:
+            - generic [ref=f13e65]:
+              - generic [ref=f13e66]: Workspace
+              - heading "Hello User" [level=1] [ref=f13e67]
+            - paragraph [ref=f13e68]: Pick a module to work with. List views mirror your data; use Django Admin for full create/edit until forms ship.
+            - generic [ref=f13e69]:
+              - link "Companies Core" [ref=f13e70] [cursor=pointer]:
+                - /url: /app/core/company/
+                - generic [ref=f13e71]: Companies
+                - generic [ref=f13e72]: Core
+              - link "Countries Core" [ref=f13e73] [cursor=pointer]:
+                - /url: /app/core/country/
+                - generic [ref=f13e74]: Countries
+                - generic [ref=f13e75]: Core
+              - link "Currencies Core" [ref=f13e76] [cursor=pointer]:
+                - /url: /app/core/currency/
+                - generic [ref=f13e77]: Currencies
+                - generic [ref=f13e78]: Core
+              - link "Users Accounts" [ref=f13e79] [cursor=pointer]:
+                - /url: /app/accounts/user/
+                - generic [ref=f13e80]: Users
+                - generic [ref=f13e81]: Accounts
+              - link "Groups Accounts" [ref=f13e82] [cursor=pointer]:
+                - /url: /app/auth/group/
+                - generic [ref=f13e83]: Groups
+                - generic [ref=f13e84]: Accounts
+              - link "Accounts Finance" [ref=f13e85] [cursor=pointer]:
+                - /url: /app/finance/account/
+                - generic [ref=f13e86]: Accounts
+                - generic [ref=f13e87]: Finance
+              - link "Cost Centers Finance" [ref=f13e88] [cursor=pointer]:
+                - /url: /app/finance/costcenter/
+                - generic [ref=f13e89]: Cost Centers
+                - generic [ref=f13e90]: Finance
+              - link "Data Imports Desk" [ref=f13e91] [cursor=pointer]:
+                - /url: /app/desk/dataimport/
+                - generic [ref=f13e92]: Data Imports
+                - generic [ref=f13e93]: Desk
+              - link "Administration Users, groups, permissions" [ref=f13e94] [cursor=pointer]:
+                - /url: /admin/
+                - generic [ref=f13e95]: Administration
+                - generic [ref=f13e96]: Users, groups, permissions

@@ -1,0 +1,226 @@
+- generic [ref=e2]:
+  - region
+  - generic [ref=e3]:
+    - link "Skip to content" [ref=e4] [cursor=pointer]:
+      - /url: "#start-of-content"
+    - banner [ref=e6]:
+      - heading "Navigation Menu" [level=2] [ref=e7]
+      - generic [ref=e8]:
+        - link "Homepage" [ref=e10] [cursor=pointer]:
+          - /url: /
+          - img [ref=e11]
+        - generic [ref=e13]:
+          - navigation "Global" [ref=e16]:
+            - list [ref=e17]:
+              - listitem [ref=e18]:
+                - button "Platform" [ref=e20] [cursor=pointer]:
+                  - text: Platform
+                  - img [ref=e21]
+              - listitem [ref=e23]:
+                - button "Solutions" [ref=e25] [cursor=pointer]:
+                  - text: Solutions
+                  - img [ref=e26]
+              - listitem [ref=e28]:
+                - button "Resources" [ref=e30] [cursor=pointer]:
+                  - text: Resources
+                  - img [ref=e31]
+              - listitem [ref=e33]:
+                - button "Open Source" [ref=e35] [cursor=pointer]:
+                  - text: Open Source
+                  - img [ref=e36]
+              - listitem [ref=e38]:
+                - button "Enterprise" [ref=e40] [cursor=pointer]:
+                  - text: Enterprise
+                  - img [ref=e41]
+              - listitem [ref=e43]:
+                - link "Pricing" [ref=e44] [cursor=pointer]:
+                  - /url: https://github.com/pricing
+                  - generic [ref=e45]: Pricing
+          - generic [ref=e46]:
+            - button "Search or jump to…" [ref=e49] [cursor=pointer]:
+              - img [ref=e51]
+            - link "Sign in" [ref=e54] [cursor=pointer]:
+              - /url: /login?return_to=https%3A%2F%2Fgithub.com%2Fsafvanhuzain%2Ffairdee-erp%2Fcompare%2Fmain...flow%2Fui-20260424-67651c%3Fexpand%3D1
+            - link "Sign up" [ref=e55] [cursor=pointer]:
+              - /url: /signup?ref_cta=Sign+up&ref_loc=header+logged+out&ref_page=%2F%3Cuser-name%3E%2F%3Crepo-name%3E%2Fcompare%2Fshow&source=header-repo&source_repo=safvanhuzain%2Ffairdee-erp
+            - button "Appearance settings" [disabled] [ref=e58]:
+              - img
+  - main [ref=e62]:
+    - generic [ref=e63]:
+      - generic [ref=e64]:
+        - generic [ref=e66]:
+          - img [ref=e67]
+          - link "safvanhuzain" [ref=e70] [cursor=pointer]:
+            - /url: /safvanhuzain
+          - generic [ref=e71]: /
+          - strong [ref=e72]:
+            - link "fairdee-erp" [ref=e73] [cursor=pointer]:
+              - /url: /safvanhuzain/fairdee-erp
+          - generic [ref=e74]: Public
+        - generic [ref=e75]:
+          - list:
+            - listitem [ref=e76]:
+              - link "You must be signed in to change notification settings" [ref=e77] [cursor=pointer]:
+                - /url: /login?return_to=%2Fsafvanhuzain%2Ffairdee-erp
+                - img [ref=e78]
+                - text: Notifications
+            - listitem [ref=e80]:
+              - link "Fork 0" [ref=e81] [cursor=pointer]:
+                - /url: /login?return_to=%2Fsafvanhuzain%2Ffairdee-erp
+                - img [ref=e82]
+                - text: Fork
+                - generic "0" [ref=e84]
+            - listitem [ref=e85]:
+              - link "You must be signed in to star a repository" [ref=e87] [cursor=pointer]:
+                - /url: /login?return_to=%2Fsafvanhuzain%2Ffairdee-erp
+                - img [ref=e88]
+                - text: Star
+                - generic "0 users starred this repository" [ref=e90]: "0"
+      - navigation "Repository" [ref=e91]:
+        - list [ref=e92]:
+          - listitem [ref=e93]:
+            - link "Code" [ref=e94] [cursor=pointer]:
+              - /url: /safvanhuzain/fairdee-erp
+              - img [ref=e95]
+              - generic [ref=e97]: Code
+          - listitem [ref=e98]:
+            - link "Issues" [ref=e99] [cursor=pointer]:
+              - /url: /safvanhuzain/fairdee-erp/issues
+              - img [ref=e100]
+              - generic [ref=e103]: Issues
+          - listitem [ref=e104]:
+            - link "Pull requests" [ref=e105] [cursor=pointer]:
+              - /url: /safvanhuzain/fairdee-erp/pulls
+              - img [ref=e106]
+              - generic [ref=e108]: Pull requests
+          - listitem [ref=e109]:
+            - link "Actions" [ref=e110] [cursor=pointer]:
+              - /url: /safvanhuzain/fairdee-erp/actions
+              - img [ref=e111]
+              - generic [ref=e113]: Actions
+          - listitem [ref=e114]:
+            - link "Projects" [ref=e115] [cursor=pointer]:
+              - /url: /safvanhuzain/fairdee-erp/projects
+              - img [ref=e116]
+              - generic [ref=e118]: Projects
+          - listitem [ref=e119]:
+            - link "Security and quality" [ref=e120] [cursor=pointer]:
+              - /url: /safvanhuzain/fairdee-erp/security
+              - img [ref=e121]
+              - generic [ref=e123]: Security and quality
+          - listitem [ref=e124]:
+            - link "Insights" [ref=e125] [cursor=pointer]:
+              - /url: /safvanhuzain/fairdee-erp/pulse
+              - img [ref=e126]
+              - generic [ref=e128]: Insights
+    - generic [ref=e131]:
+      - generic [ref=e132]:
+        - heading "Comparing changes" [level=1] [ref=e133]
+        - generic [ref=e134]:
+          - text: Choose two branches to see what’s changed or to start a new pull request. If you need to, you can also
+          - button "compare across forks" [ref=e135] [cursor=pointer]
+          - text: or
+          - link "learn more about diff comparisons" [ref=e136] [cursor=pointer]:
+            - /url: https://docs.github.com/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-comparing-branches-in-pull-requests#three-dot-and-two-dot-git-diff-comparisons
+          - text: .
+      - generic [ref=e137]:
+        - img [ref=e138]
+        - group [ref=e141]:
+          - 'generic "base: main" [ref=e142] [cursor=pointer]':
+            - generic [ref=e144]:
+              - text: "base:"
+              - generic [ref=e145]: main
+            - generic:
+              - img
+        - generic [ref=e147]:
+          - 'img "Three-dot diff: changes since branches diverged" [ref=e148]'
+          - generic [ref=e150]: ...
+        - group [ref=e152]:
+          - 'generic "compare: flow/ui-20260424-67651c" [ref=e153] [cursor=pointer]':
+            - generic [ref=e155]:
+              - text: "compare:"
+              - generic [ref=e156]: flow/ui-20260424-67651c
+            - generic:
+              - img
+        - generic [ref=e158]:
+          - generic:
+            - strong [ref=e159]: Checking mergeability…
+            - text: Don’t worry, you can still create the pull request.
+      - list [ref=e161]:
+        - listitem [ref=e162]:
+          - img [ref=e163]
+          - text: 1 commit
+        - listitem [ref=e165]:
+          - img [ref=e166]
+          - text: 7 files changed
+        - listitem [ref=e168]:
+          - img [ref=e169]
+          - text: 1 contributor
+      - generic [ref=e172]:
+        - img [ref=e174]
+        - generic [ref=e176]:
+          - heading "Commits on Apr 24, 2026" [level=3] [ref=e177]
+          - list [ref=e178]:
+            - listitem [ref=e179]:
+              - generic [ref=e180]:
+                - paragraph [ref=e181]:
+                  - 'link "Flow: changes" [ref=e182] [cursor=pointer]':
+                    - /url: /safvanhuzain/fairdee-erp/commit/9fa0e1693a0ef6ef58150ded2cecb8de4ab30cd2
+                - generic [ref=e183]:
+                  - link "@safvanhuzain" [ref=e186] [cursor=pointer]:
+                    - /url: /safvanhuzain
+                    - img "@safvanhuzain" [ref=e187]
+                  - generic [ref=e188]:
+                    - link "safvanhuzain" [ref=e189] [cursor=pointer]:
+                      - /url: /safvanhuzain/fairdee-erp/commits?author=safvanhuzain
+                    - text: committed Apr 24, 2026now
+              - generic [ref=e190]:
+                - generic [ref=e191]:
+                  - button "Copy the full SHA" [ref=e194] [cursor=pointer]:
+                    - img [ref=e195]
+                  - link "9fa0e16" [ref=e200] [cursor=pointer]:
+                    - /url: /safvanhuzain/fairdee-erp/commit/9fa0e1693a0ef6ef58150ded2cecb8de4ab30cd2
+                    - generic [ref=e202]: 9fa0e16
+                - link "Browse the repository at this point in the history" [ref=e205] [cursor=pointer]:
+                  - /url: /safvanhuzain/fairdee-erp/tree/9fa0e1693a0ef6ef58150ded2cecb8de4ab30cd2
+                  - img
+      - generic "Loading Files" [ref=e207]:
+        - generic [ref=e209]:
+          - img [ref=e210]
+          - generic [ref=e213]: Loading
+  - contentinfo [ref=e214]:
+    - heading "Footer" [level=2] [ref=e215]
+    - generic [ref=e216]:
+      - generic [ref=e217]:
+        - link "GitHub Homepage" [ref=e218] [cursor=pointer]:
+          - /url: https://github.com
+          - img [ref=e219]
+        - generic [ref=e221]: © 2026 GitHub, Inc.
+      - navigation "Footer" [ref=e222]:
+        - heading "Footer navigation" [level=3] [ref=e223]
+        - list "Footer navigation" [ref=e224]:
+          - listitem [ref=e225]:
+            - link "Terms" [ref=e226] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/github-terms/github-terms-of-service
+          - listitem [ref=e227]:
+            - link "Privacy" [ref=e228] [cursor=pointer]:
+              - /url: https://docs.github.com/site-policy/privacy-policies/github-privacy-statement
+          - listitem [ref=e229]:
+            - link "Security" [ref=e230] [cursor=pointer]:
+              - /url: https://github.com/security
+          - listitem [ref=e231]:
+            - link "Status" [ref=e232] [cursor=pointer]:
+              - /url: https://www.githubstatus.com/
+          - listitem [ref=e233]:
+            - link "Community" [ref=e234] [cursor=pointer]:
+              - /url: https://github.community/
+          - listitem [ref=e235]:
+            - link "Docs" [ref=e236] [cursor=pointer]:
+              - /url: https://docs.github.com/
+          - listitem [ref=e237]:
+            - link "Contact" [ref=e238] [cursor=pointer]:
+              - /url: https://support.github.com?tags=dotcom-footer
+          - listitem [ref=e239]:
+            - button "Manage cookies" [ref=e241] [cursor=pointer]
+          - listitem [ref=e242]:
+            - button "Do not share my personal information" [ref=e244] [cursor=pointer]

@@ -1,0 +1,25 @@
+- generic [active] [ref=e1]:
+  - heading "Desk Playwright smoke" [level=1] [ref=e2]
+  - paragraph [ref=e3]: Runs headless Chromium against the Django desk (login → workspace).
+  - list [ref=e4]:
+    - listitem [ref=e5]:
+      - text: "Start Django:"
+      - code [ref=e6]: python manage.py runserver
+    - listitem [ref=e7]:
+      - text: Set
+      - code [ref=e8]: FAIRDEE_SMOKE_EMAIL
+      - text: and
+      - code [ref=e9]: FAIRDEE_SMOKE_PASSWORD
+    - listitem [ref=e10]:
+      - text: "Optional:"
+      - code [ref=e11]: FAIRDEE_BASE_URL
+      - text: (default
+      - code [ref=e12]: http://127.0.0.1:8000
+      - text: )
+  - paragraph [ref=e13]: Or enter credentials below (sent only to this localhost server as JSON).
+  - generic [ref=e14]:
+    - textbox "Email" [ref=e15]
+    - textbox "Password" [ref=e16]
+    - textbox "Base URL (optional)" [ref=e17]
+  - button "Run smoke" [ref=e18] [cursor=pointer]
+  - generic [ref=e19]: "{ \"ok\": true, \"returncode\": 0, \"stdout\": \"smoke ok: workspace shows Hello User\\n\", \"stderr\": \"\" }"

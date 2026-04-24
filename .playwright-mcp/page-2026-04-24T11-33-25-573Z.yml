@@ -1,0 +1,42 @@
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - heading "Fairdee · Flow" [level=1] [ref=e4]
+    - paragraph [ref=e5]: Plain-language prompt for Cursor / notes, plus desk Playwright smoke.
+    - region "Change request (plain text)" [ref=e6]:
+      - heading "Change request (plain text)" [level=2] [ref=e7]
+      - paragraph [ref=e8]:
+        - text: Copied into smoke env as
+        - code [ref=e9]: FAIRDEE_FLOW_PROMPT
+        - text: when you run smoke. Use for your own workflow (e.g. paste into Cursor).
+    - generic [ref=e10]: Prompt
+    - textbox "Prompt" [ref=e11]:
+      - /placeholder: Describe what you want changed in fairdee-erp…
+    - paragraph [ref=e12]:
+      - text: "Smoke: workspace heading should read"
+      - strong [ref=e13]: Hello User
+      - text: . Run Django on
+      - code [ref=e14]: http://127.0.0.1:8000
+      - text: or set base URL below.
+    - list [ref=e15]:
+      - listitem [ref=e16]:
+        - code [ref=e17]: python manage.py runserver
+      - listitem [ref=e18]:
+        - code [ref=e19]: FAIRDEE_SMOKE_EMAIL
+        - text: /
+        - code [ref=e20]: FAIRDEE_SMOKE_PASSWORD
+        - text: or form
+    - paragraph [ref=e21]: Credentials are sent only to this localhost server as JSON.
+    - generic [ref=e22]:
+      - textbox "Email" [ref=e23]
+      - textbox "Password" [ref=e24]
+      - textbox "Base URL (optional)" [ref=e25]
+    - button "Run smoke" [ref=e26] [cursor=pointer]
+  - generic [ref=e27]:
+    - generic [ref=e28]:
+      - generic [ref=e29]: Preview
+      - textbox "Django app URL" [ref=e30]: http://127.0.0.1:8000/app/
+      - button "Reload" [ref=e31] [cursor=pointer]
+    - iframe [ref=e32]:
+      - generic [ref=f4e3]:
+        - strong [ref=f4e4]: 127.0.0.1
+        - text: refused to connect.

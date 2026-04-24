@@ -1,0 +1,75 @@
+- generic [ref=e2]:
+  - generic [ref=e3]:
+    - heading "Fairdee · Flow" [level=1] [ref=e4]
+    - paragraph [ref=e5]:
+      - text: Preview the desk, write
+      - strong [ref=e6]: Plain text
+      - text: for Cursor, then
+      - strong [ref=e7]: Handoff
+      - text: . Optional Playwright smoke below.
+    - region "Plain text" [ref=e8]:
+      - heading "Plain text" [level=2] [ref=e9]
+      - paragraph [ref=e10]:
+        - text: Your change request only. Sent to smoke as
+        - code [ref=e11]: FAIRDEE_FLOW_PROMPT
+        - text: when you run smoke.
+      - generic [ref=e12]: Plain text change request
+      - textbox "Plain text change request" [ref=e13]:
+        - /placeholder: Describe the change you want in fairdee-erp…
+    - region "Handoff · Cursor / Engineering" [ref=e14]:
+      - heading "Handoff · Cursor / Engineering" [level=2] [ref=e15]
+      - paragraph [ref=e16]:
+        - text: Builds markdown (repo root + agent steps) and opens
+        - link "Cursor" [ref=e17] [cursor=pointer]:
+          - /url: https://cursor.com
+        - text: ’s prompt link.
+        - strong [ref=e18]: Engineering
+        - text: adds an extra checklist. GitHub branch/PR uses the button below when enabled.
+      - generic [ref=e19]:
+        - button "Handoff → Cursor" [ref=e20] [cursor=pointer]
+        - button "Handoff → Engineering" [ref=e21] [cursor=pointer]
+        - button "Copy handoff markdown" [ref=e22] [cursor=pointer]
+      - status [ref=e23]
+    - separator [ref=e24]
+    - heading "GitHub" [level=2] [ref=e25]
+    - paragraph [ref=e26]:
+      - text: Branch from
+      - code [ref=e27]: origin
+      - text: default branch, commit every file that differs from
+      - code [ref=e28]: HEAD
+      - text: (including new untracked files under those paths), push, then open GitHub’s compare page. Enable with
+      - code [ref=e29]: FLOW_ENABLE_GITHUB_BUTTON=1
+      - text: and restart Flow.
+    - button "Create changes on GitHub" [disabled] [ref=e30]
+    - status [ref=e31]
+    - separator [ref=e32]
+    - heading "Desk smoke (Playwright)" [level=2] [ref=e33]
+    - paragraph [ref=e34]:
+      - text: Workspace heading must read
+      - strong [ref=e35]: Hello User
+      - text: . Run Django on
+      - code [ref=e36]: http://127.0.0.1:8000
+      - text: or set base URL below.
+    - list [ref=e37]:
+      - listitem [ref=e38]:
+        - code [ref=e39]: python manage.py runserver
+      - listitem [ref=e40]:
+        - code [ref=e41]: FAIRDEE_SMOKE_EMAIL
+        - text: /
+        - code [ref=e42]: FAIRDEE_SMOKE_PASSWORD
+        - text: or form
+    - paragraph [ref=e43]: Credentials are sent only to this localhost server as JSON.
+    - generic [ref=e44]:
+      - textbox "Email" [ref=e45]
+      - textbox "Password" [ref=e46]
+      - textbox "Base URL (optional)" [ref=e47]
+    - button "Run smoke" [ref=e48] [cursor=pointer]
+  - generic [ref=e49]:
+    - generic [ref=e50]:
+      - generic [ref=e51]: Preview
+      - textbox "Django app URL" [ref=e52]: http://127.0.0.1:8000/app/
+      - button "Reload" [ref=e53] [cursor=pointer]
+      - link "Open in tab" [ref=e54] [cursor=pointer]:
+        - /url: http://127.0.0.1:8000/app/
+    - iframe [ref=e55]:
+      

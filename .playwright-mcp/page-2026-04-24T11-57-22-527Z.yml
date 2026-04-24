@@ -1,0 +1,105 @@
+- generic [ref=e2]:
+  - complementary "Main navigation" [ref=e3]:
+    - generic [ref=e4]:
+      - generic [ref=e5]: F
+      - generic [ref=e6]: Fairdee Finance
+    - generic [ref=e7]:
+      - generic [ref=e8]: Workspace
+      - navigation [ref=e9]:
+        - link "Home" [ref=e10] [cursor=pointer]:
+          - /url: /app/
+          - img [ref=e11]
+          - text: Home
+      - generic [ref=e14]: Core
+      - navigation [ref=e15]:
+        - link "Companies" [ref=e16] [cursor=pointer]:
+          - /url: /app/core/company/
+          - img [ref=e17]
+          - text: Companies
+        - link "Countries" [ref=e20] [cursor=pointer]:
+          - /url: /app/core/country/
+          - img [ref=e21]
+          - text: Countries
+        - link "Currencies" [ref=e24] [cursor=pointer]:
+          - /url: /app/core/currency/
+          - img [ref=e25]
+          - text: Currencies
+      - generic [ref=e28]: Accounts
+      - navigation [ref=e29]:
+        - link "Users" [ref=e30] [cursor=pointer]:
+          - /url: /app/accounts/user/
+          - img [ref=e31]
+          - text: Users
+        - link "Groups" [ref=e34] [cursor=pointer]:
+          - /url: /app/auth/group/
+          - img [ref=e35]
+          - text: Groups
+      - generic [ref=e38]: Finance
+      - navigation [ref=e39]:
+        - link "Accounts" [ref=e40] [cursor=pointer]:
+          - /url: /app/finance/account/
+          - img [ref=e41]
+          - text: Accounts
+        - link "Cost Centers" [ref=e44] [cursor=pointer]:
+          - /url: /app/finance/costcenter/
+          - img [ref=e45]
+          - text: Cost Centers
+      - generic [ref=e48]: Desk
+      - navigation [ref=e49]:
+        - link "Data Imports" [ref=e50] [cursor=pointer]:
+          - /url: /app/desk/dataimport/
+          - img [ref=e51]
+          - text: Data Imports
+    - generic [ref=e54]:
+      - link "Django Admin" [ref=e55] [cursor=pointer]:
+        - /url: /admin/
+      - text: ·
+      - link "Log out" [ref=e56] [cursor=pointer]:
+        - /url: /logout/
+  - generic [ref=e57]:
+    - banner [ref=e58]:
+      - generic [ref=e59]: Home
+      - generic [ref=e61]:
+        - generic [ref=e62]: E
+        - generic [ref=e63]: e2e@fairdee.local
+    - main [ref=e64]:
+      - generic [ref=e65]:
+        - generic [ref=e66]: Workspace
+        - heading "Hello User" [level=1] [ref=e67]
+      - generic [ref=e68]:
+        - link "Companies Core" [ref=e69] [cursor=pointer]:
+          - /url: /app/core/company/
+          - generic [ref=e70]: Companies
+          - generic [ref=e71]: Core
+        - link "Countries Core" [ref=e72] [cursor=pointer]:
+          - /url: /app/core/country/
+          - generic [ref=e73]: Countries
+          - generic [ref=e74]: Core
+        - link "Currencies Core" [ref=e75] [cursor=pointer]:
+          - /url: /app/core/currency/
+          - generic [ref=e76]: Currencies
+          - generic [ref=e77]: Core
+        - link "Users Accounts" [ref=e78] [cursor=pointer]:
+          - /url: /app/accounts/user/
+          - generic [ref=e79]: Users
+          - generic [ref=e80]: Accounts
+        - link "Groups Accounts" [ref=e81] [cursor=pointer]:
+          - /url: /app/auth/group/
+          - generic [ref=e82]: Groups
+          - generic [ref=e83]: Accounts
+        - link "Accounts Finance" [ref=e84] [cursor=pointer]:
+          - /url: /app/finance/account/
+          - generic [ref=e85]: Accounts
+          - generic [ref=e86]: Finance
+        - link "Cost Centers Finance" [ref=e87] [cursor=pointer]:
+          - /url: /app/finance/costcenter/
+          - generic [ref=e88]: Cost Centers
+          - generic [ref=e89]: Finance
+        - link "Data Imports Desk" [ref=e90] [cursor=pointer]:
+          - /url: /app/desk/dataimport/
+          - generic [ref=e91]: Data Imports
+          - generic [ref=e92]: Desk
+        - link "Administration Users, groups, permissions" [ref=e93] [cursor=pointer]:
+          - /url: /admin/
+          - generic [ref=e94]: Administration
+          - generic [ref=e95]: Users, groups, permissions

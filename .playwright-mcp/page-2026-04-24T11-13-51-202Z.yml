@@ -1,0 +1,40 @@
+- generic [active] [ref=e1]:
+  - heading "Desk Playwright smoke" [level=1] [ref=e2]
+  - paragraph [ref=e3]: Runs headless Chromium against the Django desk (login → workspace).
+  - region "Quick prompt" [ref=e4]:
+    - heading "Quick prompt" [level=2] [ref=e5]
+    - paragraph [ref=e6]:
+      - text: After login, the workspace heading must read
+      - strong [ref=e7]: Hello User
+      - text: . Keep Django on
+      - code [ref=e8]: http://127.0.0.1:8000
+      - text: unless you override the base URL.
+  - list [ref=e9]:
+    - listitem [ref=e10]:
+      - text: "Start Django:"
+      - code [ref=e11]: python manage.py runserver
+    - listitem [ref=e12]:
+      - text: Set
+      - code [ref=e13]: FAIRDEE_SMOKE_EMAIL
+      - text: and
+      - code [ref=e14]: FAIRDEE_SMOKE_PASSWORD
+      - text: on the server process,
+      - emphasis [ref=e15]: or
+      - text: fill the form below
+    - listitem [ref=e16]:
+      - text: "Optional:"
+      - code [ref=e17]: FAIRDEE_BASE_URL
+      - text: (default
+      - code [ref=e18]: http://127.0.0.1:8000
+      - text: )
+  - paragraph [ref=e19]: Credentials are sent only to this localhost server as JSON.
+  - generic [ref=e20]: Optional note (printed when smoke runs)
+  - textbox "Optional note (printed when smoke runs)" [ref=e21]:
+    - /placeholder: e.g. Re-check after deploy
+    - text: Playwright MCP check
+  - generic [ref=e22]:
+    - textbox "Email" [ref=e23]
+    - textbox "Password" [ref=e24]
+    - textbox "Base URL (optional)" [ref=e25]
+  - button "Run smoke" [ref=e26] [cursor=pointer]
+  - generic [ref=e27]: "{ \"ok\": true, \"returncode\": 0, \"stdout\": \"flow note: Playwright MCP check\\nsmoke ok: workspace shows Hello User\\n\", \"stderr\": \"\" }"
