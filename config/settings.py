@@ -45,6 +45,14 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+# Flow (e.g. :8765) iframes runserver (:8000). Different ports = different origins, so
+# X-Frame-Options from clickjacking middleware blocks that preview. We cannot set
+# X_FRAME_OPTIONS = None — Django 4.2's middleware calls .upper() on it and crashes.
+# In DEBUG, drop the middleware so no framing header is sent (unless DJANGO_IFRAME_DENY).
+_frame_deny = os.environ.get('DJANGO_IFRAME_DENY', '').lower() in ('1', 'true', 'yes')
+if DEBUG and not _frame_deny:
+    MIDDLEWARE = [mw for mw in MIDDLEWARE if mw != 'django.middleware.clickjacking.XFrameOptionsMiddleware']
+
 ROOT_URLCONF = 'config.urls'
 
 TEMPLATES = [

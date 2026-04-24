@@ -8,3 +8,6 @@ staticfiles/
 *.egg-info/
 .DS_Store
 media/
+
+# Cursor Playwright MCP snapshots (local only; never ship in PRs)
+.playwright-mcp/

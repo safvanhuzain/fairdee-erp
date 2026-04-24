@@ -1,0 +1,1 @@
+Playwright MCP smoke for Flow GitHub button (safe to delete).
